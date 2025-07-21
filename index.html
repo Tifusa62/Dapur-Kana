@@ -47,16 +47,26 @@
     <div class="card">
       <h2>Nasi Goreng Spesial</h2>
       <p>Rp 15.000</p>
-      <button>Pesan</button>
+      <button onclick="tambahKeKeranjang(this)" data-nama="Nasi Goreng Spesial" data-harga="15000">Pesan</button>
     </div>
     <div class="card">
       <h2>Ayam Geprek</h2>
       <p>Rp 18.000</p>
-      <button>Pesan</button>
+      <button onclick="tambahKeKeranjang(this)" data-nama="Ayam Geprek" data-harga="18000">Pesan</button>
     </div>
   </div>
 
   <footer>© 2025 Dapur Kana</footer>
+<script>
+  let keranjang = JSON.parse(localStorage.getItem('keranjang')) || [];
 
+  function tambahKeKeranjang(btn) {
+    const nama = btn.dataset.nama;
+    const harga = parseInt(btn.dataset.harga);
+    keranjang.push({ nama, harga });
+    localStorage.setItem('keranjang', JSON.stringify(keranjang));
+    alert(nama + " ditambahkan ke keranjang!");
+  }
+</script>
 </body>
 </html>
