@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout - Dapur Kana</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Keranjang</h1>
+    <nav>
+      <a href="index.html">Beranda</a>
+      <a href="menu.html">Menu</a>
+    </nav>
+  </header>
+
+  <main>
+    <div id="keranjangContainer">
+      <!-- Item keranjang akan ditampilkan di sini -->
+    </div>
+    <div id="totalContainer" style="padding:1rem; text-align:center; font-size:1.2rem;"></div>
+    <div style="text-align:center; margin-top: 1rem;">
+      <button onclick="checkout()" style="background:#4CAF50; color:white; border:none; padding:0.75rem 1.5rem; font-size:1rem; border-radius:0.5rem;">Bayar Sekarang</button>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Dapur Kana</p>
+  </footer>
+
+  <script>
+    const keranjangContainer = document.getElementById("keranjangContainer")
+    const totalContainer = document.getElementById("totalContainer")
+
+    function renderKeranjang() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || []
+      if (cart.length === 0) {
+        keranjangContainer.innerHTML = "<p style='text-align:center;'>Keranjang kosong.</p>"
+        totalContainer.innerHTML = ""
+        return
+      }
+
+      keranjangContainer.innerHTML = ""
+      let total = 0
+
+      cart.forEach((item, index) => {
+        const itemTotal = item.harga * item.qty
+        total += itemTotal
+        const div = document.createElement("div")
+        div.className = "keranjang-item"
+        div.innerHTML = `
+          <p><strong>${item.nama}</strong><br>
+          Rp ${item.harga.toLocaleString()} x ${item.qty} = Rp ${itemTotal.toLocaleString()}</p>
+          <button onclick="hapusItem(${index})">Hapus</button>
+        `
+        keranjangContainer.appendChild(div)
+      })
+
+      totalContainer.innerHTML = `Total: <strong>Rp ${total.toLocaleString()}</strong>`
+    }
+
+    function hapusItem(index) {
+      const cart = JSON.parse(localStorage.getItem("cart")) || []
+      cart.splice(index, 1)
+      localStorage.setItem("cart", JSON.stringify(cart))
+      renderKeranjang()
+    }
+
+    function checkout() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || []
+      if (cart.length === 0) {
+        alert("Keranjang kosong!")
+        return
+      }
+
+      alert("Terima kasih! Pesanan Anda sedang diproses.")
+      localStorage.removeItem("cart")
+      renderKeranjang()
+    }
+
+    renderKeranjang()
+  </script>
+
+  <style>
+    .keranjang-item {
+      background: white;
+      margin: 1rem;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .keranjang-item button {
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.4rem;
+      cursor: pointer;
+    }
+  </style>
+</body>
+</html>
