@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notifikasi - Dapur Kana</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Notifikasi</h1>
+    <nav>
+      <a href="index.html">Beranda</a>
+      <a href="menu.html">Menu</a>
+      <a href="checkout.html">Keranjang</a>
+    </nav>
+  </header>
+
+  <main>
+    <section style="padding: 1rem;">
+      <h2>Status Pesanan Anda</h2>
+      <ul id="notifikasiList" style="list-style: none; padding: 0;">
+        <!-- Notifikasi pesanan ditampilkan di sini -->
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Dapur Kana</p>
+  </footer>
+
+  <script>
+    // Simulasi notifikasi (nantinya bisa dari Supabase Realtime atau fetch dari database)
+    const notifikasiList = document.getElementById("notifikasiList");
+
+    // Simulasi data (bisa diganti dengan fetch dari Supabase)
+    const notifikasi = [
+      { pesan: "Pesanan #123 telah dikonfirmasi.", waktu: "2025-07-21 10:15" },
+      { pesan: "Pesanan #123 sedang dimasak.", waktu: "2025-07-21 10:20" },
+      { pesan: "Pesanan #123 siap dikirim.", waktu: "2025-07-21 10:35" }
+    ];
+
+    notifikasi.forEach(item => {
+      const li = document.createElement("li");
+      li.style.background = "#fff";
+      li.style.marginBottom = "1rem";
+      li.style.padding = "1rem";
+      li.style.borderRadius = "0.75rem";
+      li.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+      li.innerHTML = `<strong>${item.pesan}</strong><br><small>${item.waktu}</small>`;
+      notifikasiList.appendChild(li);
+    });
+  </script>
+
+</body>
+</html>
