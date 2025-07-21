@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detail Menu - Dapur Kana</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Detail Menu</h1>
+    <nav>
+      <a href="index.html">Beranda</a>
+      <a href="menu.html">Menu</a>
+      <a href="checkout.html">Keranjang 🛒</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="menu-detail" id="detailContainer">
+      <!-- Detail menu ditampilkan di sini -->
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Dapur Kana</p>
+  </footer>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js"
+
+    const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const params = new URLSearchParams(window.location.search)
+    const menuId = params.get("id")
+
+    const container = document.getElementById("detailContainer")
+
+    async function loadDetail() {
+      const { data, error } = await supabase
+        .from("menu")
+        .select("*")
+        .eq("id", menuId)
+        .single()
+
+      if (error || !data) {
+        container.innerHTML = "<p>Menu tidak ditemukan.</p>"
+        return
+      }
+
+      container.innerHTML = `
+        <img src="${data.gambar_url}" alt="${data.nama}" class="detail-img" />
+        <h2>${data.nama}</h2>
+        <p><strong>Harga:</strong> Rp ${data.harga.toLocaleString()}</p>
+        <p><strong>Kategori:</strong> ${data.kategori}</p>
+        <p>${data.deskripsi}</p>
+        <button onclick="tambahKeKeranjang('${data.id}', '${data.nama}', ${data.harga})">Pesan Sekarang</button>
+      `
+    }
+
+    window.tambahKeKeranjang = function(id, nama, harga) {
+      const cart = JSON.parse(localStorage.getItem("cart")) || []
+      const existing = cart.find(item => item.id === id)
+      if (existing) {
+        existing.qty += 1
+      } else {
+        cart.push({ id, nama, harga, qty: 1 })
+      }
+      localStorage.setItem("cart", JSON.stringify(cart))
+      alert(`${nama} ditambahkan ke keranjang!`)
+    }
+
+    loadDetail()
+  </script>
+
+  <style>
+    .menu-detail {
+      padding: 1rem;
+      text-align: center;
+    }
+    .menu-detail img {
+      max-width: 90%;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+    }
+    .menu-detail button {
+      background: #ff914d;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+  </style>
+</body>
+</html>
