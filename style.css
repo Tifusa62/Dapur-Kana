@@ -1,0 +1,52 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fff8f2;
+}
+header {
+  background: #ff914d;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+header nav a {
+  margin: 0 10px;
+  color: white;
+  text-decoration: none;
+}
+.menu-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+.menu-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  text-align: center;
+}
+.menu-card img {
+  max-width: 100%;
+  border-radius: 8px;
+  height: 100px;
+  object-fit: cover;
+}
+button {
+  background: #ff914d;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+footer {
+  background: #ff914d;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+}
