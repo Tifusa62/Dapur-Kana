@@ -8,100 +8,146 @@
 </head>
 <body>
 
-  <header>
-    <h1>Keranjang</h1>
-    <nav>
-  <a href="index.html">Beranda</a> |
-  <a href="menu.html">Menu</a> |
-  <a href="checkout.html">Keranjang</a> |
-  <a href="notifikasi.html">Notifikasi</a> |
-  <a href="owner.html">Owner</a>
-</nav>
-  </header>
+<header>
+  <h1>Checkout</h1>
+  <nav>
+    <a href="index.html">Beranda</a> |
+    <a href="menu.html">Menu</a> |
+    <a href="checkout.html">Keranjang</a> |
+    <a href="notifikasi.html">Notifikasi</a> |
+    <a href="owner.html">Owner</a>
+  </nav>
+</header>
 
-  <main>
-    <div id="keranjangContainer">
-      <!-- Item keranjang akan ditampilkan di sini -->
-    </div>
-    <div id="totalContainer" style="padding:1rem; text-align:center; font-size:1.2rem;"></div>
-    <div style="text-align:center; margin-top: 1rem;">
-      <button onclick="checkout()" style="background:#4CAF50; color:white; border:none; padding:0.75rem 1.5rem; font-size:1rem; border-radius:0.5rem;">Bayar Sekarang</button>
-    </div>
-  </main>
+<main>
+  <div id="keranjangContainer"></div>
+  <div id="totalContainer" style="padding:1rem; text-align:center;"></div>
 
-  <footer>
-    <p>© 2025 Dapur Kana</p>
-  </footer>
+  <form id="formCheckout" style="margin: 2rem;">
+    <h3>Data Pelanggan</h3>
+    <label>Nama:</label><br/>
+    <input type="text" id="nama" required><br/><br/>
 
-  <script>
-    const keranjangContainer = document.getElementById("keranjangContainer")
-    const totalContainer = document.getElementById("totalContainer")
+    <label>No HP:</label><br/>
+    <input type="tel" id="hp" required><br/><br/>
 
-    function renderKeranjang() {
-      const cart = JSON.parse(localStorage.getItem("cart")) || []
-      if (cart.length === 0) {
-        keranjangContainer.innerHTML = "<p style='text-align:center;'>Keranjang kosong.</p>"
-        totalContainer.innerHTML = ""
-        return
-      }
+    <label>Alamat (boleh link titik Google Maps):</label><br/>
+    <textarea id="alamat" required></textarea><br/><br/>
 
-      keranjangContainer.innerHTML = ""
-      let total = 0
+    <label>Pilih Pembayaran:</label><br/>
+    <select id="pembayaran" required>
+      <option value="">-- Pilih --</option>
+      <option value="QRIS">QRIS</option>
+      <option value="BCA">BCA</option>
+      <option value="Mandiri">Mandiri</option>
+      <option value="LinkAja">LinkAja</option>
+    </select><br/><br/>
 
-      cart.forEach((item, index) => {
-        const itemTotal = item.harga * item.qty
-        total += itemTotal
-        const div = document.createElement("div")
-        div.className = "keranjang-item"
-        div.innerHTML = `
-          <p><strong>${item.nama}</strong><br>
-          Rp ${item.harga.toLocaleString()} x ${item.qty} = Rp ${itemTotal.toLocaleString()}</p>
-          <button onclick="hapusItem(${index})">Hapus</button>
-        `
-        keranjangContainer.appendChild(div)
-      })
+    <button type="submit" style="padding: 0.75rem 1.5rem; background: green; color: white; border: none; border-radius: 0.5rem;">Bayar Sekarang</button>
+  </form>
+</main>
 
-      totalContainer.innerHTML = `Total: <strong>Rp ${total.toLocaleString()}</strong>`
+<footer>
+  <p>© 2025 Dapur Kana</p>
+</footer>
+
+<script>
+  const keranjangContainer = document.getElementById("keranjangContainer");
+  const totalContainer = document.getElementById("totalContainer");
+
+  function renderKeranjang() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (cart.length === 0) {
+      keranjangContainer.innerHTML = "<p style='text-align:center;'>Keranjang kosong.</p>";
+      totalContainer.innerHTML = "";
+      return;
     }
 
-    function hapusItem(index) {
-      const cart = JSON.parse(localStorage.getItem("cart")) || []
-      cart.splice(index, 1)
-      localStorage.setItem("cart", JSON.stringify(cart))
-      renderKeranjang()
+    keranjangContainer.innerHTML = "<h3 style='text-align:center;'>Pesanan Anda</h3>";
+    let total = 0;
+
+    cart.forEach((item) => {
+      const itemTotal = item.harga * item.qty;
+      total += itemTotal;
+      const div = document.createElement("div");
+      div.className = "keranjang-item";
+      div.innerHTML = `
+        <p><strong>${item.nama}</strong><br>
+        Rp ${item.harga.toLocaleString()} x ${item.qty} = Rp ${itemTotal.toLocaleString()}</p>
+      `;
+      keranjangContainer.appendChild(div);
+    });
+
+    totalContainer.innerHTML = `Total: <strong>Rp ${total.toLocaleString()}</strong>`;
+  }
+
+  document.getElementById("formCheckout").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const nama = document.getElementById("nama").value.trim();
+    const hp = document.getElementById("hp").value.trim();
+    const alamat = document.getElementById("alamat").value.trim();
+    const pembayaran = document.getElementById("pembayaran").value;
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (cart.length === 0) {
+      alert("Keranjang kosong!");
+      return;
     }
 
-    function checkout() {
-      const cart = JSON.parse(localStorage.getItem("cart")) || []
-      if (cart.length === 0) {
-        alert("Keranjang kosong!")
-        return
-      }
+    const pesanan = {
+      nama,
+      hp,
+      alamat,
+      pembayaran,
+      tanggal: new Date().toLocaleString(),
+      items: cart
+    };
 
-      alert("Terima kasih! Pesanan Anda sedang diproses.")
-      localStorage.removeItem("cart")
-      renderKeranjang()
-    }
+    // Simpan ke notifikasi (simulasi tracking)
+    const histori = JSON.parse(localStorage.getItem("pesananHistori")) || [];
+    histori.push(pesanan);
+    localStorage.setItem("pesananHistori", JSON.stringify(histori));
 
-    renderKeranjang()
-  </script>
+    // Hapus keranjang
+    localStorage.removeItem("cart");
 
-  <style>
-    .keranjang-item {
-      background: white;
-      margin: 1rem;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .keranjang-item button {
-      background: #f44336;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 0.4rem;
-      cursor: pointer;
-    }
-  </style>
+    // Redirect ke halaman notifikasi
+    window.location.href = "notifikasi.html";
+  });
+
+  renderKeranjang();
+</script>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  header, footer {
+    background: #f8f8f8;
+    text-align: center;
+    padding: 1rem;
+  }
+  main {
+    padding: 1rem;
+  }
+  .keranjang-item {
+    background: #fff;
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  input, textarea, select {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 0.4rem;
+    border: 1px solid #ccc;
+  }
+</style>
+
 </body>
 </html>
