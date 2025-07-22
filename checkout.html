@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Checkout - Dapur Kana</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
 
@@ -52,6 +53,11 @@
 </footer>
 
 <script>
+  // GANTI dengan URL dan anon key milikmu
+  const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co'
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'; // gunakan key kamu
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
   const keranjangContainer = document.getElementById("keranjangContainer");
   const totalContainer = document.getElementById("totalContainer");
 
@@ -81,7 +87,7 @@
     totalContainer.innerHTML = `Total: <strong>Rp ${total.toLocaleString()}</strong>`;
   }
 
-  document.getElementById("formCheckout").addEventListener("submit", function(e) {
+  document.getElementById("formCheckout").addEventListener("submit", async function(e) {
     e.preventDefault();
 
     const nama = document.getElementById("nama").value.trim();
@@ -95,24 +101,22 @@
       return;
     }
 
-    const pesanan = {
-      nama,
-      hp,
-      alamat,
-      pembayaran,
-      tanggal: new Date().toLocaleString(),
-      items: cart
-    };
+    const { data, error } = await supabase.from("pesanan").insert([{
+      nama: nama,
+      no_hp: hp,
+      alamat: alamat,
+      pembayaran: pembayaran,
+      keranjang: cart,
+      tanggal: new Date().toISOString()
+    }]);
 
-    // Simpan ke notifikasi (simulasi tracking)
-    const histori = JSON.parse(localStorage.getItem("pesananHistori")) || [];
-    histori.push(pesanan);
-    localStorage.setItem("pesananHistori", JSON.stringify(histori));
+    if (error) {
+      console.error("Gagal menyimpan ke Supabase:", error.message);
+      alert("Gagal menyimpan pesanan. Coba lagi.");
+      return;
+    }
 
-    // Hapus keranjang
     localStorage.removeItem("cart");
-
-    // Redirect ke halaman notifikasi
     window.location.href = "notifikasi.html";
   });
 
