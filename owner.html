@@ -1,22 +1,21 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 <head>
   <title>Owner - Dapur Kana</title>
-  <meta charset="UTF-8" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
-  <nav>
-    <a href="index.html">Beranda</a> |
-    <a href="menu.html">Menu</a> |
-    <a href="checkout.html">Keranjang</a> |
-    <a href="notifikasi.html">Notifikasi</a> |
-    <a href="owner.html">Owner</a>
-  </nav>  <section id="loginSection">
-    <h2>Login Owner</h2>
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button id="loginBtn">Login</button>
-  </section>  <section id="dashboard" style="display:none;">
+  <h1>Owner Panel</h1>
+
+  <section id="loginSection">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+  </section>
+
+  <section id="dashboard" style="display:none;">
     <h2>Kelola Menu</h2>
     <form id="menuForm">
       <input type="hidden" id="menuId" />
@@ -28,58 +27,110 @@
       <button type="submit">Simpan Menu</button>
     </form>
     <div id="menuList"></div>
-  </section>  <script>
-    const supabase = supabase.createClient("https://qcevidnjbsyjfdwfduiz.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI");
+  </section>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js"
+
+    const supabaseUrl = "https://qcevidnjbsyjfdwfduiz.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"; // Ganti dengan anon key kamu
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const loginSection = document.getElementById("loginSection");
     const dashboard = document.getElementById("dashboard");
+    const menuForm = document.getElementById("menuForm");
     const menuList = document.getElementById("menuList");
 
-    document.getElementById("loginBtn").addEventListener("click", async () => {
+    // Login handler
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (error) return alert("Login gagal: " + error.message);
+      if (error) {
+        alert("Login gagal: " + error.message);
+        return;
+      }
+
       if (data.user.email === "oishidzato@gmail.com") {
         loginSection.style.display = "none";
         dashboard.style.display = "block";
         loadMenu();
       } else {
-        alert("Hanya owner yang bisa login.");
+        alert("Bukan akun owner!");
       }
     });
 
-    document.getElementById("menuForm").addEventListener("submit", async (e) => {
+    // Auto login jika sesi masih ada
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
+      if (user && user.email === "oishidzato@gmail.com") {
+        loginSection.style.display = "none";
+        dashboard.style.display = "block";
+        loadMenu();
+      }
+    })();
+
+    // Submit form menu
+    menuForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const id = document.getElementById("menuId").value;
       const nama = document.getElementById("nama").value;
       const harga = parseInt(document.getElementById("harga").value);
       const kategori = document.getElementById("kategori").value;
       const deskripsi = document.getElementById("deskripsi").value;
-      const file = document.getElementById("gambar").files[0];
+      const gambarInput = document.getElementById("gambar");
       let gambar_url = "";
 
-      if (file) {
-        const { data, error } = await supabase.storage.from("gambar-menu").upload(`menu/${Date.now()}_${file.name}`, file);
-        if (error) return alert("Upload gambar gagal: " + error.message);
-        const { data: urlData } = supabase.storage.from("gambar-menu").getPublicUrl(data.path);
-        gambar_url = urlData.publicUrl;
+      if (gambarInput.files.length > 0) {
+        const file = gambarInput.files[0];
+        const fileName = `${Date.now()}-${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("gambar-menu")
+          .upload(fileName, file);
+
+        if (uploadError) {
+          alert("Gagal upload gambar: " + uploadError.message);
+          return;
+        }
+
+        const { data: publicURL } = supabase.storage
+          .from("gambar-menu")
+          .getPublicUrl(fileName);
+
+        gambar_url = publicURL.publicUrl;
       }
 
+      let result;
       if (id) {
-        await supabase.from("menu").update({ nama, harga, kategori, deskripsi, gambar_url }).eq("id", id);
+        result = await supabase.from("menu").update({
+          nama, harga, kategori, deskripsi,
+          ...(gambar_url && { gambar_url })
+        }).eq("id", id);
       } else {
-        await supabase.from("menu").insert({ nama, harga, kategori, deskripsi, gambar_url });
+        result = await supabase.from("menu").insert({
+          nama, harga, kategori, deskripsi, gambar_url
+        });
       }
-      document.getElementById("menuForm").reset();
+
+      if (result.error) {
+        alert("Gagal simpan: " + result.error.message);
+        return;
+      }
+
+      menuForm.reset();
+      document.getElementById("menuId").value = "";
       loadMenu();
     });
 
     async function loadMenu() {
       const { data, error } = await supabase.from("menu").select("*").order("nama", { ascending: true });
       menuList.innerHTML = "";
+
       if (error) {
         console.error("Gagal load menu:", error.message);
         return;
@@ -112,15 +163,6 @@
         loadMenu();
       }
     }
-
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      const user = data.session?.user;
-      if (user && user.email === "oishidzato@gmail.com") {
-        loginSection.style.display = "none";
-        dashboard.style.display = "block";
-        loadMenu();
-      }
-    })();
-  </script></body>
+  </script>
+</body>
 </html>
