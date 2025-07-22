@@ -76,7 +76,7 @@
       const itemTotal = item.harga * item.qty;
       total += itemTotal;
       const div = document.createElement("div");
-      div.className = "keranjang-item";
+      div.className = "menu-card";
       div.innerHTML = `
         <p><strong>${item.nama}</strong><br>
         Rp ${item.harga.toLocaleString()} x ${item.qty} = Rp ${itemTotal.toLocaleString()}</p>
@@ -101,7 +101,7 @@
       return;
     }
 
-    const { data, error } = await supabase.from("pesanan").insert([{
+    const { data, error } = await supabase.from("checkout").insert([{
       nama: nama,
       no_hp: hp,
       alamat: alamat,
