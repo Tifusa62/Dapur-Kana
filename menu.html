@@ -25,59 +25,70 @@
   </footer>
 
   <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+  import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
-    const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // dipersingkat untuk keamanan
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const menuList = document.getElementById("menuList");
+  const menuList = document.getElementById("menuList");
 
-    async function loadMenu() {
-      const { data, error } = await supabase
-        .from('menu')
-        .select('*');
+  async function loadMenu() {
+    const { data, error } = await supabase
+      .from('menu')
+      .select('*');
 
-      if (error) {
-        console.error("Gagal mengambil data:", error.message);
-        menuList.innerHTML = `<p>Gagal memuat menu. Coba lagi nanti.</p>`;
-        return;
-      }
-
-      if (data.length === 0) {
-        menuList.innerHTML = `<p>Belum ada menu tersedia.</p>`;
-        return;
-      }
-
-      menuList.innerHTML = "";
-      data.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "menu-card";
-        div.innerHTML = `
-          <img src="${item.gambar_url}" alt="${item.nama}" />
-          <h3>${item.nama}</h3>
-          <p>${item.deskripsi || ""}</p>
-          <p>Rp ${item.harga.toLocaleString()}</p>
-          <button onclick="tambahKeKeranjang('${item.id}', '${item.nama}', ${item.harga})">Pesan</button>
-        `;
-        menuList.appendChild(div);
-      });
+    if (error) {
+      console.error("Gagal mengambil data:", error.message);
+      menuList.innerHTML = `<p>Gagal memuat menu. Coba lagi nanti.</p>`;
+      return;
     }
 
-    window.tambahKeKeranjang = function(id, nama, harga) {
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existing = cart.find(item => item.id === id);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({ id, nama, harga, qty: 1 });
-      }
-      localStorage.setItem("cart", JSON.stringify(cart));
-      alert(`${nama} ditambahkan ke keranjang!`);
+    if (data.length === 0) {
+      menuList.innerHTML = `<p>Belum ada menu tersedia.</p>`;
+      return;
     }
 
-    loadMenu();
-  </script>
+    menuList.innerHTML = "";
+    data.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "menu-card";
+      div.innerHTML = `
+        <img src="${item.gambar_url}" alt="${item.nama}" />
+        <h3>${item.nama}</h3>
+        <p>${item.deskripsi || ""}</p>
+        <p>Rp ${item.harga.toLocaleString()}</p>
+        <label>Jumlah: </label>
+        <input type="number" id="qty-${item.id}" value="1" min="1" style="width: 60px;" />
+        <button onclick="tambahKeKeranjang('${item.id}', '${item.nama}', ${item.harga})">Pesan</button>
+      `;
+      menuList.appendChild(div);
+    });
+  }
+
+  window.tambahKeKeranjang = function(id, nama, harga) {
+    const qtyInput = document.getElementById(`qty-${id}`);
+    const qty = parseInt(qtyInput?.value || "1");
+
+    if (qty < 1) {
+      alert("Jumlah minimal 1");
+      return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existing = cart.find(item => item.id === id);
+    if (existing) {
+      existing.qty += qty;
+    } else {
+      cart.push({ id, nama, harga, qty });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert(`${qty}x ${nama} ditambahkan ke keranjang!`);
+  }
+
+  loadMenu();
+</script>
 
 </body>
 </html>
