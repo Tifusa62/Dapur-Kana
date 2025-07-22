@@ -83,7 +83,112 @@
         loadMenu();
       }
     })();
+    <h2>Kelola Banner</h2>
 
+<!-- Form Upload -->
+<input type="file" id="bannerUpload" />
+<button onclick="uploadBanner()">Upload Banner</button>
+
+<!-- Daftar Banner -->
+<div id="bannerList" style="margin-top: 1rem;"></div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+  const supabaseUrl = "https://qcevidnjbsyjfdwfduiz.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"; // Ganti dengan anon key kamu
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  // Upload banner
+  async function uploadBanner() {
+    const fileInput = document.getElementById('bannerUpload')
+    const file = fileInput.files[0]
+    if (!file) return alert('Pilih gambar terlebih dahulu.')
+
+    const fileName = `${Date.now()}_${file.name}`
+    const { data, error } = await supabase.storage
+      .from('banner')
+      .upload(fileName, file)
+
+    if (error) {
+      alert('Gagal upload banner:', error.message)
+      return
+    }
+
+    const { publicUrl } = supabase.storage
+      .from('banner')
+      .getPublicUrl(fileName)
+
+    const insert = await supabase
+      .from('banner')
+      .insert([{ url: publicUrl }])
+
+    if (insert.error) {
+      alert('Gagal simpan banner:', insert.error.message)
+    } else {
+      alert('Banner berhasil diupload!')
+      loadBannerList()
+    }
+  }
+
+  // Tampilkan banner
+  async function loadBannerList() {
+    const container = document.getElementById('bannerList')
+    container.innerHTML = 'Memuat...'
+
+    const { data, error } = await supabase
+      .from('banner')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      container.innerHTML = 'Gagal memuat banner.'
+      return
+    }
+
+    if (data.length === 0) {
+      container.innerHTML = 'Belum ada banner.'
+      return
+    }
+
+    container.innerHTML = ''
+    data.forEach(item => {
+      const div = document.createElement('div')
+      div.style.marginBottom = '1rem'
+
+      const img = document.createElement('img')
+      img.src = item.url
+      img.style.width = '100%'
+      img.style.maxWidth = '300px'
+      img.style.borderRadius = '1rem'
+
+      const btn = document.createElement('button')
+      btn.textContent = 'Hapus'
+      btn.style.marginTop = '0.5rem'
+      btn.onclick = () => deleteBanner(item.id, item.url)
+
+      div.appendChild(img)
+      div.appendChild(document.createElement('br'))
+      div.appendChild(btn)
+
+      container.appendChild(div)
+    })
+  }
+
+  // Hapus banner
+  async function deleteBanner(id, url) {
+    const path = url.split('/').pop().split('?')[0]
+    const del = await supabase.storage.from('banner').remove([path])
+    const { error } = await supabase.from('banner').delete().eq('id', id)
+
+    if (error || del.error) {
+      alert('Gagal menghapus banner.')
+    } else {
+      alert('Banner berhasil dihapus.')
+      loadBannerList()
+    }
+  }
+loadBannerList()
     // Submit form menu
     menuForm.addEventListener("submit", async (e) => {
       e.preventDefault();
