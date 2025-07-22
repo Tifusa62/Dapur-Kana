@@ -9,51 +9,74 @@
 <body>
 
   <header>
-    <h1>Notifikasi</h1>
+    <h1>📢 Notifikasi Pesanan</h1>
     <nav>
-  <a href="index.html">Beranda</a> |
-  <a href="menu.html">Menu</a> |
-  <a href="checkout.html">Keranjang</a> |
-  <a href="notifikasi.html">Notifikasi</a> |
-  <a href="owner.html">Owner</a>
-</nav>
+      <a href="index.html">Beranda</a>
+      <a href="menu.html">Menu</a>
+      <a href="checkout.html">Keranjang</a>
+    </nav>
   </header>
 
-  <main>
-    <section style="padding: 1rem;">
-      <h2>Status Pesanan Anda</h2>
-      <ul id="notifikasiList" style="list-style: none; padding: 0;">
-        <!-- Notifikasi pesanan ditampilkan di sini -->
-      </ul>
-    </section>
+  <main style="padding: 1rem;">
+    <div id="notifList">
+      <p>Memuat notifikasi...</p>
+    </div>
   </main>
 
   <footer>
     <p>© 2025 Dapur Kana</p>
   </footer>
 
-  <script>
-    // Simulasi notifikasi (nantinya bisa dari Supabase Realtime atau fetch dari database)
-    const notifikasiList = document.getElementById("notifikasiList");
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
-    // Simulasi data (bisa diganti dengan fetch dari Supabase)
-    const notifikasi = [
-      { pesan: "Pesanan #123 telah dikonfirmasi.", waktu: "2025-07-21 10:15" },
-      { pesan: "Pesanan #123 sedang dimasak.", waktu: "2025-07-21 10:20" },
-      { pesan: "Pesanan #123 siap dikirim.", waktu: "2025-07-21 10:35" }
-    ];
+    const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'; // gunakan key kamu
+    const supabase = createClient(supabaseUrl, supabaseKey)
 
-    notifikasi.forEach(item => {
-      const li = document.createElement("li");
-      li.style.background = "#fff";
-      li.style.marginBottom = "1rem";
-      li.style.padding = "1rem";
-      li.style.borderRadius = "0.75rem";
-      li.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
-      li.innerHTML = `<strong>${item.pesan}</strong><br><small>${item.waktu}</small>`;
-      notifikasiList.appendChild(li);
-    });
+    const notifList = document.getElementById("notifList");
+
+    async function loadNotifikasi() {
+      const { data, error } = await supabase
+        .from('pesanan')
+        .select('*')
+        .order('waktu', { ascending: false });
+
+      if (error) {
+        notifList.innerHTML = `<p style="color:red;">Gagal memuat notifikasi: ${error.message}</p>`;
+        return;
+      }
+
+      if (data.length === 0) {
+        notifList.innerHTML = "<p>Belum ada pesanan masuk.</p>";
+        return;
+      }
+
+      notifList.innerHTML = "";
+      data.forEach(pesan => {
+        const div = document.createElement("div");
+        div.className = "menu-card"; // gunakan styling kartu dari CSS yang sama
+        const tanggal = new Date(pesan.waktu).toLocaleString();
+
+        const itemsList = pesan.items.map(item => `
+          <li>${item.nama} x${item.qty} - Rp ${item.harga * item.qty}</li>
+        `).join("");
+
+        div.innerHTML = `
+          <h3>👤 ${pesan.nama}</h3>
+          <p>📞 ${pesan.no_hp}</p>
+          <p>📍 ${pesan.alamat}</p>
+          <p>🕒 ${tanggal}</p>
+          <ul>${itemsList}</ul>
+          <p>💳 Pembayaran: <strong>${pesan.metode}</strong></p>
+          <p>Total: <strong>Rp ${pesan.total.toLocaleString()}</strong></p>
+          <p>Status: <em>${pesan.status || 'Menunggu'}</em></p>
+        `;
+        notifList.appendChild(div);
+      });
+    }
+
+    loadNotifikasi();
   </script>
-
 </body>
 </html>
