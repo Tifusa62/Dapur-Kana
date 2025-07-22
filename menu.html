@@ -9,30 +9,15 @@
 <body>
 
   <header>
-    <h1>📋 Menu Dapur Kana</h1>
+    <h1>🍽️ Menu Dapur Kana</h1>
     <nav>
-  <a href="index.html">Beranda</a> |
-  <a href="menu.html">Menu</a> |
-  <a href="checkout.html">Keranjang</a> |
-  <a href="notifikasi.html">Notifikasi</a> |
-  <a href="owner.html">Owner</a>
-</nav>
+      <a href="index.html">Beranda</a>
+      <a href="checkout.html">Keranjang 🛒</a>
+    </nav>
   </header>
 
-  <main>
-    <div style="padding: 1rem;">
-      <label for="filterKategori"><strong>Filter Kategori:</strong></label>
-      <select id="filterKategori">
-        <option value="">Semua</option>
-        <option value="makanan">Makanan</option>
-        <option value="minuman">Minuman</option>
-        <option value="snack">Snack</option>
-      </select>
-    </div>
-
-    <div class="menu-container" id="menuList">
-      <!-- List menu akan ditampilkan di sini -->
-    </div>
+  <main class="menu-container" id="menuList">
+    <!-- Daftar menu dari Supabase akan muncul di sini -->
   </main>
 
   <footer>
@@ -40,57 +25,58 @@
   </footer>
 
   <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js"
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
     const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const menuList = document.getElementById("menuList")
-    const filterKategori = document.getElementById("filterKategori")
+    const menuList = document.getElementById("menuList");
 
-    async function loadMenu(kategori = "") {
-      let query = supabase.from("menu").select("*")
-      if (kategori) query = query.eq("kategori", kategori)
-
-      const { data, error } = await query
+    async function loadMenu() {
+      const { data, error } = await supabase
+        .from('menu')
+        .select('*');
 
       if (error) {
-        console.error("Gagal memuat data:", error.message)
-        return
+        console.error("Gagal mengambil data:", error.message);
+        menuList.innerHTML = `<p>Gagal memuat menu. Coba lagi nanti.</p>`;
+        return;
       }
 
-      menuList.innerHTML = ""
+      if (data.length === 0) {
+        menuList.innerHTML = `<p>Belum ada menu tersedia.</p>`;
+        return;
+      }
+
+      menuList.innerHTML = "";
       data.forEach(item => {
-        const div = document.createElement("div")
-        div.className = "menu-card"
+        const div = document.createElement("div");
+        div.className = "menu-card";
         div.innerHTML = `
           <img src="${item.gambar_url}" alt="${item.nama}" />
           <h3>${item.nama}</h3>
+          <p>${item.deskripsi || ""}</p>
           <p>Rp ${item.harga.toLocaleString()}</p>
           <button onclick="tambahKeKeranjang('${item.id}', '${item.nama}', ${item.harga})">Pesan</button>
-        `
-        menuList.appendChild(div)
-      })
+        `;
+        menuList.appendChild(div);
+      });
     }
 
     window.tambahKeKeranjang = function(id, nama, harga) {
-      const cart = JSON.parse(localStorage.getItem("cart")) || []
-      const existing = cart.find(item => item.id === id)
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existing = cart.find(item => item.id === id);
       if (existing) {
-        existing.qty += 1
+        existing.qty += 1;
       } else {
-        cart.push({ id, nama, harga, qty: 1 })
+        cart.push({ id, nama, harga, qty: 1 });
       }
-      localStorage.setItem("cart", JSON.stringify(cart))
-      alert(`${nama} ditambahkan ke keranjang!`)
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(`${nama} ditambahkan ke keranjang!`);
     }
 
-    filterKategori.addEventListener("change", () => {
-      loadMenu(filterKategori.value)
-    })
-
-    loadMenu()
+    loadMenu();
   </script>
 
 </body>
