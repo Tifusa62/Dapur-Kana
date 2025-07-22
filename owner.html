@@ -2,238 +2,201 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Owner - Dapur Kana</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #fff8f2;
-      color: #333;
-    }
-
-    header {
-      background: #ff914d;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-    }
-
-    .hamburger {
-      font-size: 24px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -250px;
-      width: 250px;
-      height: 100%;
-      background: #ff914d;
-      padding: 20px;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-      transition: left 0.3s ease;
-      z-index: 999;
-    }
-
-    .sidebar.show {
-      left: 0;
-    }
-
-    .sidebar a {
-      display: block;
-      margin: 16px 0;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .content {
-      padding: 1rem;
-    }
-
-    h2 {
-      color: #ff914d;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background: #ff914d;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    table {
-      width: 100%;
-      background: white;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
-      margin-top: 10px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dapur Kana - Owner</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
+  <!-- HEADER -->
+  <header>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <button id="menuToggle" class="hamburger">☰</button>
+      <h1 style="margin: 0; flex: 1; text-align: center;">Dapur Kana - Owner</h1>
+      <div class="icons">
+        <a href="checkout.html">🛒</a>
+        <a href="notifikasi.html">🔔</a>
+      </div>
+    </div>
+  </header>
 
-<div id="sidebar" class="sidebar">
-  <a href="#editMenu">Edit Menu</a>
-  <a href="#editBanner">Edit Homepage (Banner)</a>
-</div>
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="sidebar">
+    <a href="#" onclick="showEditMenu()">Edit Menu</a>
+    <a href="#" onclick="showEditBanner()">Edit Homepage (Banner)</a>
+  </div>
 
-<header>
-  <button class="hamburger" id="hamburgerBtn">☰</button>
-  <div class="title">Owner Panel</div>
-  <div></div>
-</header>
+  <!-- MAIN CONTENT -->
+  <main>
+    <!-- Login Section -->
+    <section id="loginSection">
+      <h2>Login Owner</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+    </section>
 
-<div class="content">
-  <section id="editMenu">
-    <h2>Edit Menu</h2>
-    <form id="menuForm">
-      <input type="text" id="nama" placeholder="Nama Menu" required />
-      <input type="number" id="harga" placeholder="Harga" required />
-      <input type="text" id="kategori" placeholder="Kategori" required />
-      <input type="text" id="deskripsi" placeholder="Deskripsi" required />
-      <input type="text" id="gambar_url" placeholder="Link Gambar" required />
-      <button type="submit">Tambah Menu</button>
-    </form>
-    <table id="menuTable">
-      <thead>
-        <tr><th>Nama</th><th>Harga</th><th>Kategori</th><th>Gambar</th><th>Aksi</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
+    <!-- Edit Menu Section -->
+    <section id="menuSection" style="display: none;">
+      <h2>Edit Menu</h2>
+      <input type="text" id="nama" placeholder="Nama Menu" />
+      <input type="number" id="harga" placeholder="Harga" />
+      <input type="text" id="kategori" placeholder="Kategori" />
+      <textarea id="deskripsi" placeholder="Deskripsi"></textarea>
+      <input type="file" id="gambar" />
+      <button onclick="tambahMenu()">Tambah Menu</button>
+      <div id="listMenu"></div>
+    </section>
 
-  <section id="editBanner">
-    <h2>Edit Homepage (Banner)</h2>
-    <form id="bannerForm">
-      <input type="text" id="banner_url" placeholder="URL Gambar Banner Baru" required />
-      <button type="submit">Ganti Banner</button>
-    </form>
-    <h4>Preview Banner Saat Ini:</h4>
-    <div id="currentBanner"></div>
-  </section>
-</div>
+    <!-- Edit Banner Section -->
+    <section id="bannerSection" style="display: none;">
+      <h2>Edit Banner Homepage</h2>
+      <input type="file" id="bannerInput" />
+      <button onclick="uploadBanner()">Upload Banner</button>
+      <div id="currentBanner"></div>
+    </section>
+  </main>
 
-<script>
-import { createClient } from "https://esm.sh/@supabase/supabase-js"
-
-const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
+  <script>
+    // Konfigurasi Supabase
+    const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
-const supabase = createClient(supabaseUrl, supabaseKey)
-  // Sidebar toggle
-  const sidebar = document.getElementById('sidebar');
-  document.getElementById('hamburgerBtn').onclick = () => {
-    sidebar.classList.toggle('show');
-  };
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // =================== MENU =======================
-  const menuForm = document.getElementById('menuForm');
-  const menuTableBody = document.querySelector('#menuTable tbody');
+    // Toggle Sidebar
+    document.getElementById('menuToggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('show');
+    });
 
-  async function loadMenu() {
-    const { data, error } = await supabase.from('menu').select('*');
-    if (data) {
-      menuTableBody.innerHTML = '';
-      data.forEach(item => {
-        const row = `
-          <tr>
-            <td>${item.nama}</td>
-            <td>${item.harga}</td>
-            <td>${item.kategori}</td>
-            <td><img src="${item.gambar_url}" width="50" /></td>
-            <td><button onclick="deleteMenu('${item.id}')">Hapus</button></td>
-          </tr>`;
-        menuTableBody.innerHTML += row;
+    // Tampilkan section
+    function showEditMenu() {
+      document.getElementById('menuSection').style.display = 'block';
+      document.getElementById('bannerSection').style.display = 'none';
+    }
+
+    function showEditBanner() {
+      document.getElementById('menuSection').style.display = 'none';
+      document.getElementById('bannerSection').style.display = 'block';
+    }
+
+    // Login Owner
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (email !== "oishidzato@gmail.com") {
+        alert("Hanya owner yang bisa login");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        alert("Login gagal: " + error.message);
+      } else {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("menuSection").style.display = "block";
+        loadMenu();
+        loadBanner();
+      }
+    }
+
+    // Tambah Menu
+    async function tambahMenu() {
+      const nama = document.getElementById("nama").value;
+      const harga = parseInt(document.getElementById("harga").value);
+      const kategori = document.getElementById("kategori").value;
+      const deskripsi = document.getElementById("deskripsi").value;
+      const gambarFile = document.getElementById("gambar").files[0];
+
+      if (!nama || !harga || !kategori || !deskripsi || !gambarFile) {
+        alert("Lengkapi semua form");
+        return;
+      }
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("menu-images")
+        .upload(`menu/${Date.now()}_${gambarFile.name}`, gambarFile);
+
+      if (uploadError) {
+        alert("Gagal upload gambar");
+        return;
+      }
+
+      const gambar_url = `${SUPABASE_URL}/storage/v1/object/public/menu-images/${uploadData.path}`;
+
+      const { data, error } = await supabase.from("menu").insert([
+        { nama, harga, kategori, deskripsi, gambar_url },
+      ]);
+
+      if (error) {
+        alert("Gagal menambah menu");
+      } else {
+        alert("Menu ditambahkan");
+        loadMenu();
+      }
+    }
+
+    // Load Menu
+    async function loadMenu() {
+      const { data, error } = await supabase.from("menu").select("*");
+
+      const list = document.getElementById("listMenu");
+      list.innerHTML = "";
+
+      data.forEach((item) => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p><strong>${item.nama}</strong> - Rp${item.harga}</p>
+          <button onclick="hapusMenu('${item.id}')">Hapus</button>
+        `;
+        list.appendChild(div);
       });
     }
-  }
 
-  menuForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const newItem = {
-      nama: document.getElementById('nama').value,
-      harga: Number(document.getElementById('harga').value),
-      kategori: document.getElementById('kategori').value,
-      deskripsi: document.getElementById('deskripsi').value,
-      gambar_url: document.getElementById('gambar_url').value
-    };
-    const { error } = await supabase.from('menu').insert([newItem]);
-    if (!error) {
-      menuForm.reset();
-      loadMenu();
-    }
-  });
-
-  async function deleteMenu(id) {
-    const { error } = await supabase.from('menu').delete().eq('id', id);
-    if (!error) loadMenu();
-  }
-
-  // =================== BANNER =====================
-  const bannerForm = document.getElementById('bannerForm');
-  const currentBanner = document.getElementById('currentBanner');
-
-  async function loadBanner() {
-    const { data, error } = await supabase.from('banner').select('*').limit(1).single();
-    if (data && data.url) {
-      currentBanner.innerHTML = `<img src="${data.url}" alt="Banner Saat Ini">`;
-    }
-  }
-
-  bannerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const newUrl = document.getElementById('banner_url').value;
-
-    // Cek apakah sudah ada banner sebelumnya
-    const { data: existingBanner } = await supabase.from('banner').select('id').limit(1).single();
-
-    if (existingBanner) {
-      await supabase.from('banner').update({ url: newUrl }).eq('id', existingBanner.id);
-    } else {
-      await supabase.from('banner').insert([{ url: newUrl }]);
+    // Hapus Menu
+    async function hapusMenu(id) {
+      const { error } = await supabase.from("menu").delete().eq("id", id);
+      if (error) {
+        alert("Gagal menghapus");
+      } else {
+        loadMenu();
+      }
     }
 
-    loadBanner();
-    bannerForm.reset();
-  });
+    // Upload Banner
+    async function uploadBanner() {
+      const bannerFile = document.getElementById("bannerInput").files[0];
+      if (!bannerFile) return;
 
-  // =================== INIT =======================
-  loadMenu();
-  loadBanner();
-</script>
+      const { data: uploadData, error } = await supabase.storage
+        .from("banners")
+        .upload(`banner/${Date.now()}_${bannerFile.name}`, bannerFile, {
+          upsert: true,
+        });
+
+      if (error) {
+        alert("Upload gagal");
+        return;
+      }
+
+      const url = `${SUPABASE_URL}/storage/v1/object/public/banners/${uploadData.path}`;
+
+      await supabase.from("banner").delete(); // hapus sebelumnya
+      await supabase.from("banner").insert([{ url }]);
+
+      loadBanner();
+      alert("Banner diperbarui!");
+    }
+
+    // Load Banner
+    async function loadBanner() {
+      const { data, error } = await supabase.from("banner").select("*").limit(1);
+      const div = document.getElementById("currentBanner");
+      if (data.length > 0) {
+        div.innerHTML = `<img src="${data[0].url}" style="width: 100%; border-radius: 12px;" />`;
+      }
+    }
+  </script>
 </body>
 </html>
