@@ -129,7 +129,7 @@
   };
 
   async function loadMenu() {
-    const { data, error } = await supabase.from("gambar-menu").select("*").order("nama", { ascending: true });
+    const { data, error } = await supabase.from("menu").select("*").order("nama", { ascending: true });
     menuList.innerHTML = "";
 
     if (error) {
