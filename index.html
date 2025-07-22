@@ -20,17 +20,11 @@
       padding: 10px 16px;
     }
 
-    .left {
-      display: flex;
-      align-items: center;
-    }
-
     .hamburger {
       font-size: 24px;
       background: none;
       border: none;
       color: white;
-      margin-right: 10px;
       cursor: pointer;
     }
 
@@ -43,6 +37,41 @@
       display: flex;
       gap: 16px;
       font-size: 20px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      background-color: #003333;
+      padding-top: 60px;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+
+    .sidebar a {
+      padding: 10px 20px;
+      text-decoration: none;
+      color: white;
+      display: block;
+    }
+
+    .sidebar a:hover {
+      background-color: #004d4d;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 999;
     }
 
     main {
@@ -78,63 +107,79 @@
   </style>
 </head>
 <body>
-<header>
-  <div class="left">
-    <button id="menuToggle" class="hamburger">☰</button>
-    <div class="title">Dapur Kana</div>
-  </div>
 
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <a href="index.html">Beranda</a>
+  <a href="menu.html">Menu</a>
+  <a href="checkout.html">Keranjang</a>
+  <a href="notifikasi.html">Notifikasi</a>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<!-- Header -->
+<header>
+  <button id="menuToggle" class="hamburger">☰</button>
+  <div class="title">Dapur Kana</div>
   <div class="icons">
     <a href="checkout.html" style="color: white; text-decoration: none;">🛒</a>
     <a href="notifikasi.html" style="color: white; text-decoration: none;">🔔</a>
   </div>
-
-  <nav id="menuNav" style="display: none; width: 100%; margin-top: 8px;">
-    <a href="index.html" style="color: white; text-decoration: none; margin-right: 10px;">Beranda</a>
-    <a href="menu.html" style="color: white; text-decoration: none; margin-right: 10px;">Menu</a>
-    <a href="checkout.html" style="color: white; text-decoration: none; margin-right: 10px;">Keranjang</a>
-    <a href="notifikasi.html" style="color: white; text-decoration: none;">Notifikasi</a>
-  </nav>
 </header>
-  <main>
-    <div class="main-title">Dapur Kana</div>
 
-    <div class="banner-grid" id="bannerContainer">
-      <!-- Banner akan diisi dari Supabase -->
-    </div>
-  </main>
+<main>
+  <div class="main-title">Dapur Kana</div>
+  <div class="banner-grid" id="bannerContainer">
+    <!-- Banner akan diisi dari Supabase -->
+  </div>
+</main>
 
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+<!-- Supabase Banner Loader -->
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
 
-    async function loadBanners() {
-      const { data, error } = await supabase
-        .from("banners")
-        .select("url")
-        .order("created_at", { ascending: false });
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
-      const container = document.getElementById("bannerContainer");
-      if (data && data.length) {
-        data.forEach(b => {
-          const img = document.createElement("img");
-          img.src = b.url;
-          container.appendChild(img);
-        });
-      } else {
-        container.innerHTML = "<p style='color:white;'>Belum ada banner</p>";
-      }
+  async function loadBanners() {
+    const { data, error } = await supabase
+      .from("banners")
+      .select("url")
+      .order("created_at", { ascending: false });
+
+    const container = document.getElementById("bannerContainer");
+    if (data && data.length) {
+      data.forEach(b => {
+        const img = document.createElement("img");
+        img.src = b.url;
+        container.appendChild(img);
+      });
+    } else {
+      container.innerHTML = "<p style='color:white;'>Belum ada banner</p>";
     }
+  }
 
-    loadBanners();
-    
-  document.getElementById('menuToggle').addEventListener('click', function () {
-    const nav = document.getElementById('menuNav')
-    nav.style.display = nav.style.display === 'block' ? 'none' : 'block'
-  })
+  loadBanners();
 </script>
+
+<!-- Sidebar Script -->
+<script>
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  const toggleBtn = document.getElementById("menuToggle");
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.style.left = "0";
+    overlay.style.display = "block";
+  });
+
+  overlay.addEventListener("click", () => {
+    sidebar.style.left = "-250px";
+    overlay.style.display = "none";
+  });
+</script>
+
 </body>
 </html>
