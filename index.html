@@ -78,16 +78,28 @@
   </style>
 </head>
 <body>
+<!-- Header -->
+<header>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <!-- Tombol Hamburger -->
+    <button id="menuToggle" style="background: none; border: none; font-size: 24px; color: white;">☰</button>
+    <h1 style="margin: 0; flex: 1; text-align: center;">Dapur Kana</h1>
 
-  <header>
-    <div class="left">
-      <button class="hamburger" onclick="alert('Menu belum aktif')">☰</button>
-      <span class="title">Beranda</span>
+    <!-- Ikon Keranjang & Notifikasi -->
+    <div>
+      <a href="checkout.html" style="margin-right: 10px; color: white; text-decoration: none;">🛒</a>
+      <a href="notifikasi.html" style="color: white; text-decoration: none;">🔔</a>
     </div>
-    <div class="icons">
-      🛒 🔔
-    </div>
-  </header>
+  </div>
+
+  <!-- Menu Navigasi Sembunyi -->
+  <nav id="menuNav" style="display: none; margin-top: 1rem;">
+    <a href="index.html">Beranda</a> |
+    <a href="menu.html">Menu</a> |
+    <a href="checkout.html">Keranjang</a> |
+    <a href="notifikasi.html">Notifikasi</a>
+  </nav>
+</header>
 
   <main>
     <div class="main-title">Dapur Kana</div>
@@ -124,6 +136,11 @@
 
     loadBanners();
   </script>
-
+<script>
+  document.getElementById('menuToggle').addEventListener('click', function () {
+    const nav = document.getElementById('menuNav')
+    nav.style.display = nav.style.display === 'block' ? 'none' : 'block'
+  })
+</script>
 </body>
 </html>
