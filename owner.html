@@ -2,30 +2,16 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Owner Panel - Dapur Kana</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <title>Owner - Dapur Kana</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
+  <h1>Owner Page</h1>
 
-<nav>
-  <a href="index.html">Beranda</a> |
-  <a href="menu.html">Menu</a> |
-  <a href="checkout.html">Keranjang</a> |
-  <a href="notifikasi.html">Notifikasi</a> |
-  <a href="owner.html">Owner</a>
-</nav>
-
-<header>
-  <h1>👩‍🍳 Owner Panel</h1>
-  <button id="logoutBtn">Logout</button>
-</header>
-
-<main>
   <section id="loginSection">
-    <h2>Login Owner</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
     <button id="loginBtn">Login</button>
   </section>
 
@@ -37,145 +23,156 @@
       <input type="number" id="harga" placeholder="Harga" required />
       <input type="text" id="kategori" placeholder="Kategori" required />
       <textarea id="deskripsi" placeholder="Deskripsi" required></textarea>
-      <input type="file" id="gambar_url" accept="image/*" />
+      <input type="file" id="gambar" accept="image/*" />
       <button type="submit">Simpan Menu</button>
     </form>
 
-    <h3>Daftar Menu</h3>
     <div id="menuList"></div>
+    <button onclick="logout()">Logout</button>
   </section>
-</main>
 
-<script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js";
+  <script>
+    const supabase = supabase.createClient(
+      'https://YOUR_PROJECT_ID.supabase.co',
+      'YOUR_PUBLIC_ANON_KEY'
+    );
 
-  const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'; // gunakan yang asli
-  const supabase = createClient(supabaseUrl, supabaseKey);
+    const loginSection = document.getElementById("loginSection");
+    const dashboard = document.getElementById("dashboard");
+    const menuList = document.getElementById("menuList");
 
-  const loginSection = document.getElementById("loginSection");
-  const dashboard = document.getElementById("dashboard");
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  const menuForm = document.getElementById("menuForm");
-  const menuList = document.getElementById("menuList");
-
-  loginBtn.onclick = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: emailInput.value,
-      password: passwordInput.value,
-    });
-
-    if (error) return alert("Login gagal: " + error.message);
-
-    if (data.user.email !== "oishidzato@gmail.com") {
-      await supabase.auth.signOut();
-      return alert("Hanya pemilik yang bisa login!");
-    }
-
-    loginSection.style.display = "none";
-    dashboard.style.display = "block";
-    loadMenu();
-  };
-
-  logoutBtn.onclick = async () => {
-    await supabase.auth.signOut();
-    location.reload();
-  };
-
-  menuForm.onsubmit = async (e) => {
-    e.preventDefault();
-
-    const id = document.getElementById("menuId").value;
-    const nama = document.getElementById("nama").value;
-    const harga = parseInt(document.getElementById("harga").value);
-    const kategori = document.getElementById("kategori").value;
-    const deskripsi = document.getElementById("deskripsi").value;
-    const file = document.getElementById("gambar").files[0];
-    let gambar_url = "";
-
-    if (file) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `menu/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage.from("gambar-menu").upload(filePath, file);
-      if (uploadError) {
-        alert("Upload gambar gagal: " + uploadError.message);
+      if (error) {
+        alert("Login gagal: " + error.message);
         return;
       }
 
-      const { data: publicUrlData } = supabase.storage.from("gambar-menu").getPublicUrl(filePath);
-      gambar_url = publicUrlData.publicUrl;
+      checkAuth();
+    });
+
+    async function checkAuth() {
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
+
+      if (user && user.email === "oishidzato@gmail.com") {
+        loginSection.style.display = "none";
+        dashboard.style.display = "block";
+        loadMenu();
+      } else {
+        alert("Akses ditolak");
+        await supabase.auth.signOut();
+      }
     }
 
-    if (id) {
-      await supabase.from("gambar-menu").update({
-        nama, harga, kategori, deskripsi, ...(gambar_url && { gambar_url })
-      }).eq("id", id);
-    } else {
-      await supabase.from("gambar-menu").insert({
-        nama, harga, kategori, deskripsi, gambar_url
+    async function logout() {
+      await supabase.auth.signOut();
+      location.reload();
+    }
+
+    async function loadMenu() {
+      const { data, error } = await supabase.from("menu").select("*").order("nama", { ascending: true });
+      menuList.innerHTML = "";
+
+      if (error) {
+        console.error("Gagal load menu:", error.message);
+        return;
+      }
+
+      data.forEach(item => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <hr />
+          <p><strong>${item.nama}</strong> (Rp ${item.harga})</p>
+          ${item.gambar_url ? `<img src="${item.gambar_url}" width="100" />` : ""}
+          <button onclick='editMenu(${JSON.stringify(item)})'>Edit</button>
+          <button onclick='hapusMenu("${item.id}")'>Hapus</button>
+        `;
+        menuList.appendChild(div);
       });
     }
 
-    menuForm.reset();
-    document.getElementById("menuId").value = "";
-    loadMenu();
-  };
-
-  async function loadMenu() {
-    const { data, error } = await supabase.from("menu").select("*").order("nama", { ascending: true });
-    menuList.innerHTML = "";
-
-    if (error) {
-      console.error("Gagal load menu:", error.message);
-      return;
+    window.editMenu = (item) => {
+      document.getElementById("menuId").value = item.id;
+      document.getElementById("nama").value = item.nama;
+      document.getElementById("harga").value = item.harga;
+      document.getElementById("kategori").value = item.kategori;
+      document.getElementById("deskripsi").value = item.deskripsi;
     }
 
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <hr />
-        <p><strong>${item.nama}</strong> (Rp ${item.harga})</p>
-        ${item.gambar_url ? `<img src="${item.gambar_url}" width="100" />` : ""}
-        <button onclick='editMenu(${JSON.stringify(item)})'>Edit</button>
-        <button onclick='hapusMenu("${item.id}")'>Hapus</button>
-      `;
-      menuList.appendChild(div);
+    window.hapusMenu = async (id) => {
+      if (confirm("Hapus menu ini?")) {
+        await supabase.from("menu").delete().eq("id", id);
+        loadMenu();
+      }
+    }
+
+    document.getElementById("menuForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById("menuId").value;
+      const nama = document.getElementById("nama").value;
+      const harga = parseInt(document.getElementById("harga").value);
+      const kategori = document.getElementById("kategori").value;
+      const deskripsi = document.getElementById("deskripsi").value;
+      const gambarFile = document.getElementById("gambar").files[0];
+
+      let gambar_url = "";
+
+      if (gambarFile) {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("gambar-menu")
+          .upload(`menu/${Date.now()}_${gambarFile.name}`, gambarFile, {
+            cacheControl: "3600",
+            upsert: true,
+          });
+
+        if (uploadError) {
+          alert("Gagal upload gambar: " + uploadError.message);
+          return;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from("gambar-menu")
+          .getPublicUrl(uploadData.path);
+        gambar_url = urlData.publicUrl;
+      }
+
+      let result;
+
+      if (id) {
+        result = await supabase.from("menu").update({
+          nama,
+          harga,
+          kategori,
+          deskripsi,
+          ...(gambar_url && { gambar_url })
+        }).eq("id", id);
+      } else {
+        result = await supabase.from("menu").insert({
+          nama,
+          harga,
+          kategori,
+          deskripsi,
+          gambar_url
+        });
+      }
+
+      if (result.error) {
+        alert("Gagal menyimpan data: " + result.error.message);
+      } else {
+        alert("Menu berhasil disimpan");
+        document.getElementById("menuForm").reset();
+        document.getElementById("menuId").value = "";
+        loadMenu();
+      }
     });
-  }
 
-  window.editMenu = (item) => {
-    document.getElementById("menuId").value = item.id;
-    document.getElementById("nama").value = item.nama;
-    document.getElementById("harga").value = item.harga;
-    document.getElementById("kategori").value = item.kategori;
-    document.getElementById("deskripsi").value = item.deskripsi;
-  }
-
-  window.hapusMenu = async (id) => {
-    if (confirm("Hapus menu ini?")) {
-      await supabase.from("menu").delete().eq("id", id);
-      loadMenu();
-    }
-  }
-
-  // Auto-login
-  (async () => {
-    const { data } = await supabase.auth.getSession();
-    const user = data.session?.user;
-    if (user && user.email === "oishidzato@gmail.com") {
-      loginSection.style.display = "none";
-      dashboard.style.display = "block";
-      loadMenu();
-    }
-  })();
-</script>
-
+    checkAuth();
+  </script>
 </body>
 </html>
