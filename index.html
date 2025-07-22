@@ -78,29 +78,24 @@
   </style>
 </head>
 <body>
-<!-- Header -->
 <header>
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <!-- Tombol Hamburger -->
-    <button id="menuToggle" style="background: none; border: none; font-size: 24px; color: white;">☰</button>
-    <h1 style="margin: 0; flex: 1; text-align: center;">Dapur Kana</h1>
-
-    <!-- Ikon Keranjang & Notifikasi -->
-    <div>
-      <a href="checkout.html" style="margin-right: 10px; color: white; text-decoration: none;">🛒</a>
-      <a href="notifikasi.html" style="color: white; text-decoration: none;">🔔</a>
-    </div>
+  <div class="left">
+    <button id="menuToggle" class="hamburger">☰</button>
+    <div class="title">Dapur Kana</div>
   </div>
 
-  <!-- Menu Navigasi Sembunyi -->
-  <nav id="menuNav" style="display: none; margin-top: 1rem;">
-    <a href="index.html">Beranda</a> |
-    <a href="menu.html">Menu</a> |
-    <a href="checkout.html">Keranjang</a> |
-    <a href="notifikasi.html">Notifikasi</a>
+  <div class="icons">
+    <a href="checkout.html" style="color: white; text-decoration: none;">🛒</a>
+    <a href="notifikasi.html" style="color: white; text-decoration: none;">🔔</a>
+  </div>
+
+  <nav id="menuNav" style="display: none; width: 100%; margin-top: 8px;">
+    <a href="index.html" style="color: white; text-decoration: none; margin-right: 10px;">Beranda</a>
+    <a href="menu.html" style="color: white; text-decoration: none; margin-right: 10px;">Menu</a>
+    <a href="checkout.html" style="color: white; text-decoration: none; margin-right: 10px;">Keranjang</a>
+    <a href="notifikasi.html" style="color: white; text-decoration: none;">Notifikasi</a>
   </nav>
 </header>
-
   <main>
     <div class="main-title">Dapur Kana</div>
 
@@ -135,8 +130,7 @@
     }
 
     loadBanners();
-  </script>
-<script>
+    
   document.getElementById('menuToggle').addEventListener('click', function () {
     const nav = document.getElementById('menuNav')
     nav.style.display = nav.style.display === 'block' ? 'none' : 'block'
