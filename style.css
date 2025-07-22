@@ -11,6 +11,17 @@ header {
   text-align: center;
 }
 header nav a {
+  display: inline-block;
+  margin: 0 8px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+header nav a:hover {
+  text-decoration: underline;
+}
+header nav a {
   margin: 0 10px;
   color: white;
   text-decoration: none;
