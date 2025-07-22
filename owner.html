@@ -103,22 +103,22 @@
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `menu/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage.from("menu").upload(filePath, file);
+      const { error: uploadError } = await supabase.storage.from("gambar-menu").upload(filePath, file);
       if (uploadError) {
         alert("Upload gambar gagal: " + uploadError.message);
         return;
       }
 
-      const { data: publicUrlData } = supabase.storage.from("menu").getPublicUrl(filePath);
+      const { data: publicUrlData } = supabase.storage.from("gambar-menu").getPublicUrl(filePath);
       gambar_url = publicUrlData.publicUrl;
     }
 
     if (id) {
-      await supabase.from("menu").update({
+      await supabase.from("gambar-menu").update({
         nama, harga, kategori, deskripsi, ...(gambar_url && { gambar_url })
       }).eq("id", id);
     } else {
-      await supabase.from("menu").insert({
+      await supabase.from("gambar-menu").insert({
         nama, harga, kategori, deskripsi, gambar_url
       });
     }
@@ -129,7 +129,7 @@
   };
 
   async function loadMenu() {
-    const { data, error } = await supabase.from("menu").select("*").order("nama", { ascending: true });
+    const { data, error } = await supabase.from("gambar-menu").select("*").order("nama", { ascending: true });
     menuList.innerHTML = "";
 
     if (error) {
