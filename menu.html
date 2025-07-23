@@ -3,92 +3,241 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Menu - Dapur Kana</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Dapur Kana</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #00cfd3;
+    }
+
+    header {
+      background: #004d4d;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+    }
+
+    .hamburger {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .icons {
+      display: flex;
+      gap: 16px;
+      font-size: 20px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      background-color: #003333;
+      padding-top: 60px;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+
+    .sidebar a {
+      padding: 10px 20px;
+      text-decoration: none;
+      color: white;
+      display: block;
+    }
+
+    .sidebar a:hover {
+      background-color: #004d4d;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 999;
+    }
+
+    main {
+      padding: 16px;
+    }
+
+    .main-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    .banner-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .banner-grid img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .banner-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      color: black;
+      border-radius: 16px;
+      max-width: 90%;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      border-radius: 12px;
+    }
+
+    .modal-content h2 {
+      margin-top: 20px;
+      font-size: 22px;
+    }
+
+    .modal-content p {
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
 
-  <header>
-    <h1>🍽️ Menu Dapur Kana</h1>
-    <nav>
-      <a href="index.html">Beranda</a>
-      <a href="checkout.html">Keranjang 🛒</a>
-    </nav>
-  </header>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <a href="index.html">Beranda</a>
+  <a href="menu.html">Menu</a>
+  <a href="checkout.html">Keranjang</a>
+  <a href="notifikasi.html">Notifikasi</a>
+</div>
+<div class="overlay" id="overlay"></div>
 
-  <main class="menu-container" id="menuList">
-    <!-- Daftar menu dari Supabase akan muncul di sini -->
+<!-- Header -->
+<header>
+  <button id="menuToggle" class="hamburger">☰</button>
+  <div class="title">Dapur Kana</div>
+  <div class="icons">
+    <a href="checkout.html" style="color: white; text-decoration: none;">🛒</a>
+    <a href="notifikasi.html" style="color: white; text-decoration: none;">🔔</a>
+  </div>
+</header>
+
+  <main>
+    <div style="padding: 1rem;">
+      <label for="filterKategori"><strong>Filter Kategori:</strong></label>
+      <select id="filterKategori">
+        <option value="">Semua</option>
+        <option value="makanan">Makanan</option>
+        <option value="minuman">Minuman</option>
+        <option value="snack">Snack</option>
+      </select>
+    </div>
+
+    <div class="menu-container" id="menuList">
+      <!-- List menu akan ditampilkan di sini -->
+    </div>
   </main>
 
   <footer>
-    <p>© 2025 Dapur Kana</p>
+    <p>Â© 2025 Dapur Kana</p>
   </footer>
 
   <script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js";
+    import { createClient } from "https://esm.sh/@supabase/supabase-js"
 
-  const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'; // dipersingkat untuk keamanan
-  const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
+    const supabase = createClient(supabaseUrl, supabaseKey)
 
-  const menuList = document.getElementById("menuList");
+    const menuList = document.getElementById("menuList")
+    const filterKategori = document.getElementById("filterKategori")
 
-  async function loadMenu() {
-    const { data, error } = await supabase
-      .from('menu')
-      .select('*');
+    async function loadMenu(kategori = "") {
+      let query = supabase.from("menu").select("*")
+      if (kategori) query = query.eq("kategori", kategori)
 
-    if (error) {
-      console.error("Gagal mengambil data:", error.message);
-      menuList.innerHTML = `<p>Gagal memuat menu. Coba lagi nanti.</p>`;
-      return;
+      const { data, error } = await query
+
+      if (error) {
+        console.error("Gagal memuat data:", error.message)
+        return
+      }
+
+      menuList.innerHTML = ""
+      data.forEach(item => {
+        const div = document.createElement("div")
+        div.className = "menu-card"
+        div.innerHTML = `
+          <img src="${item.gambar_url}" alt="${item.nama}" />
+          <h3>${item.nama}</h3>
+          <p>Rp ${item.harga.toLocaleString()}</p>
+          <button onclick="tambahKeKeranjang('${item.id}', '${item.nama}', ${item.harga})">Pesan</button>
+        `
+        menuList.appendChild(div)
+      })
     }
 
-    if (data.length === 0) {
-      menuList.innerHTML = `<p>Belum ada menu tersedia.</p>`;
-      return;
+    window.tambahKeKeranjang = function(id, nama, harga) {
+      const cart = JSON.parse(localStorage.getItem("cart")) || []
+      const existing = cart.find(item => item.id === id)
+      if (existing) {
+        existing.qty += 1
+      } else {
+        cart.push({ id, nama, harga, qty: 1 })
+      }
+      localStorage.setItem("cart", JSON.stringify(cart))
+      alert(`${nama} ditambahkan ke keranjang!`)
     }
 
-    menuList.innerHTML = "";
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "menu-card";
-      div.innerHTML = `
-        <img src="${item.gambar_url}" alt="${item.nama}" />
-        <h3>${item.nama}</h3>
-        <p>${item.deskripsi || ""}</p>
-        <p>Rp ${item.harga.toLocaleString()}</p>
-        <label>Jumlah: </label>
-        <input type="number" id="qty-${item.id}" value="1" min="1" style="width: 60px;" />
-        <button onclick="tambahKeKeranjang('${item.id}', '${item.nama}', ${item.harga})">Pesan</button>
-      `;
-      menuList.appendChild(div);
-    });
-  }
+    filterKategori.addEventListener("change", () => {
+      loadMenu(filterKategori.value)
+    })
 
-  window.tambahKeKeranjang = function(id, nama, harga) {
-    const qtyInput = document.getElementById(`qty-${id}`);
-    const qty = parseInt(qtyInput?.value || "1");
-
-    if (qty < 1) {
-      alert("Jumlah minimal 1");
-      return;
-    }
-
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existing = cart.find(item => item.id === id);
-    if (existing) {
-      existing.qty += qty;
-    } else {
-      cart.push({ id, nama, harga, qty });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`${qty}x ${nama} ditambahkan ke keranjang!`);
-  }
-
-  loadMenu();
-</script>
+    loadMenu()
+  </script>
 
 </body>
 </html>
