@@ -287,30 +287,34 @@
     document.getElementById("overlay").style.display = "none";
   }
 
-  // === Cart logic (localStorage) ===
-  function tambahItem(id, harga, nama) {
-    let qty = parseInt(document.getElementById("qty-" + id).innerText);
-    qty++;
-    document.getElementById("qty-" + id).innerText = qty;
+// === Cart logic (localStorage) ===
+function tambahItem(id, harga, nama) {
+  let qty = parseInt(document.getElementById("qty-" + id).innerText);
+  qty++;
+  document.getElementById("qty-" + id).innerText = qty;
 
-    const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
-    cart[id] = cart[id] || { nama, harga, qty: 0 };
+  const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
+  cart[id] = cart[id] || { nama, harga, qty: 0 };
+  cart[id].qty = qty;
+  localStorage.setItem("keranjang", JSON.stringify(cart));
+}
+
+function kurangItem(id) {
+  let qty = parseInt(document.getElementById("qty-" + id).innerText);
+  if (qty > 0) qty--;
+  document.getElementById("qty-" + id).innerText = qty;
+
+  const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
+  if (cart[id]) {
     cart[id].qty = qty;
+    if (qty <= 0) delete cart[id];
     localStorage.setItem("keranjang", JSON.stringify(cart));
   }
+}
 
-  function kurangItem(id) {
-    let qty = parseInt(document.getElementById("qty-" + id).innerText);
-    if (qty > 0) qty--;
-    document.getElementById("qty-" + id).innerText = qty;
-
-    const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
-    if (cart[id]) {
-      cart[id].qty = qty;
-      if (qty <= 0) delete cart[id];
-      localStorage.setItem("keranjang", JSON.stringify(cart));
-    }
-  }
+// ✅ Agar bisa dipanggil dari HTML
+window.tambahItem = tambahItem;
+window.kurangItem = kurangItem;
 
   loadMenu();
 </script>
