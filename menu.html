@@ -68,8 +68,8 @@
 
     .menu-card {
       background: white;
-      border-radius: 50px;
-      padding: 50px;
+      border-radius: 16px;
+      padding: 10px;
       text-align: center;
       cursor: pointer;
       position: relative;
@@ -203,75 +203,21 @@
 </div>
 
 <script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  import { createClient } from "https://esm.sh/@supabase/supabase-js"
 
-  const supabase = createClient(
-    "https://qcevidnjbsyjfdwfduiz.supabase.co",
-    "eeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
-  );
+    const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
 
   const menuContainer = document.getElementById("menuContainer");
   const filterSelect = document.getElementById("filterKategori");
 
   async function loadMenu() {
-  try {
     const { data, error } = await supabase.from("menu").select("*").order("nama");
 
-    console.log("Data Menu:", data);
-    console.log("Error:", error);
-
-    if (error || !data || !Array.isArray(data)) {
-      menuContainer.innerHTML = "Gagal memuat menu. Periksa koneksi Supabase atau izin akses tabel.";
+    if (error) {
+      menuContainer.innerHTML = "Gagal memuat menu.";
       return;
     }
-
-    if (data.length === 0) {
-      menuContainer.innerHTML = "Belum ada menu yang tersedia.";
-      return;
-    }
-
-    const kategoriSet = new Set();
-    menuContainer.innerHTML = "";
-
-    data.forEach(item => {
-      kategoriSet.add(item.kategori);
-
-      const div = document.createElement("div");
-      div.className = "menu-card";
-      div.setAttribute("data-kategori", item.kategori);
-
-      div.innerHTML = `
-        <img src="${item.gambar_url}" alt="${item.nama}" />
-        <h3>${item.nama}</h3>
-        <p>Rp ${item.harga.toLocaleString()}</p>
-        <div class="actions">
-          <button onclick="kurangItem('${item.id}')">-</button>
-          <span id="qty-${item.id}">0</span>
-          <button onclick="tambahItem('${item.id}', ${item.harga}, '${item.nama}')">+</button>
-        </div>
-      `;
-
-      div.addEventListener("click", (e) => {
-        if (!e.target.closest(".actions")) {
-          showModal(item);
-        }
-      });
-
-      menuContainer.appendChild(div);
-    });
-
-    // Tambahkan opsi filter kategori
-    kategoriSet.forEach(kat => {
-      const option = document.createElement("option");
-      option.value = kat;
-      option.textContent = kat;
-      filterSelect.appendChild(option);
-    });
-  } catch (err) {
-    console.error("Error umum:", err);
-    menuContainer.innerHTML = "Terjadi kesalahan saat memuat menu.";
-  }
-}
 
     const kategoriSet = new Set();
     menuContainer.innerHTML = "";
