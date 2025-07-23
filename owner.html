@@ -148,6 +148,14 @@
         <button type="submit">Simpan Menu</button>
       </form>
       <div id="menuList"></div>
+      <h2>Edit Halaman Beranda (Banner)</h2>
+<form id="formBanner" style="margin-bottom:2rem;">
+  <input type="text" id="judulBanner" placeholder="Judul Banner" required><br><br>
+  <input type="text" id="subjudulBanner" placeholder="Subjudul Banner" required><br><br>
+  <input type="file" id="bannerUpload" accept="image/*" required><br><br>
+  <button type="submit" id="uploadBannerBtn">Upload Banner</button>
+</form>
+<div id="bannerList"></div>
     </section>
 
     <!-- Edit Banners -->
@@ -278,28 +286,31 @@
         loadMenu();
       }
     }
-
-    // Banner
-    const bannerInput = document.getElementById("bannerUpload");
+// === Banner Section ===
+const bannerInput = document.getElementById("bannerUpload");
 const bannerList = document.getElementById("bannerList");
 const uploadBtn = document.getElementById("uploadBannerBtn");
 
-uploadBtn.addEventListener("click", async () => {
+document.getElementById("formBanner").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const judul = document.getElementById("judulBanner").value.trim();
+  const subjudul = document.getElementById("subjudulBanner").value.trim();
   const file = bannerInput.files[0];
+
   if (!file) {
     alert("Pilih gambar terlebih dahulu.");
     return;
   }
 
   const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}.${fileExt}`;
-  const filePath = fileName;
+  const fileName = `banner_${Date.now()}.${fileExt}`;
 
   // Upload ke Supabase Storage
   const { data: uploadData, error: uploadError } = await supabase
     .storage
     .from("banners")
-    .upload(filePath, file);
+    .upload(fileName, file);
 
   if (uploadError) {
     alert("Gagal upload ke storage: " + uploadError.message);
@@ -310,17 +321,20 @@ uploadBtn.addEventListener("click", async () => {
   const { data: publicURL } = supabase
     .storage
     .from("banners")
-    .getPublicUrl(filePath);
+    .getPublicUrl(fileName);
 
-  // Simpan URL ke tabel banners
+  const url = publicURL.publicUrl;
+
+  // Simpan ke tabel banners
   const { error: dbError } = await supabase
     .from("banners")
-    .insert([{ url: publicURL.publicUrl }]);
+    .insert([{ url, judul, subjudul }]);
 
   if (dbError) {
     alert("Gagal simpan ke database: " + dbError.message);
   } else {
-    alert("Berhasil upload banner!");
+    alert("Banner berhasil diupload!");
+    document.getElementById("formBanner").reset();
     loadBannerList();
   }
 });
@@ -338,11 +352,17 @@ async function loadBannerList() {
     return;
   }
 
+  if (!data.length) {
+    bannerList.innerHTML = "Belum ada banner.";
+    return;
+  }
+
   bannerList.innerHTML = "";
   data.forEach(b => {
     const div = document.createElement("div");
     div.innerHTML = `
       <img src="${b.url}" style="max-width: 100%; border-radius: 12px;" />
+      <p><strong>${b.judul}</strong><br><small>${b.subjudul}</small></p>
       <button onclick="hapusBanner(${b.id})">Hapus</button>
       <hr />
     `;
@@ -353,10 +373,10 @@ async function loadBannerList() {
 window.hapusBanner = async (id) => {
   const { error } = await supabase.from("banners").delete().eq("id", id);
   if (!error) {
-    alert("Banner dihapus");
+    alert("Banner berhasil dihapus");
     loadBannerList();
   } else {
-    alert("Gagal hapus banner");
+    alert("Gagal menghapus banner");
   }
 };
 
