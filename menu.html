@@ -203,7 +203,7 @@
 </div>
 
 <script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js"
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2?v=1";
 
     const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
@@ -212,13 +212,26 @@
   const filterSelect = document.getElementById("filterKategori");
 
   async function loadMenu() {
-    const { data, error } = await supabase.from("menu").select("*").order("nama");
+  console.log(">> loadMenu dipanggil...");
+  const { data, error } = await supabase
+    .from("menu")
+    .select("*")
+    .order("nama");
+  console.log("RESPRES DARISU:", data, error);
 
-    if (error) {
-      menuContainer.innerHTML = "Gagal memuat menu.";
-      return;
-    }
+  if (error) {
+    console.error("ERROR dari Supabase:", error);
+    menuContainer.innerHTML = "Gagal memuat menu. Cek Console.";
+    return;
+  }
 
+  if (!data || data.length === 0) {
+    menuContainer.innerHTML = "Belum ada menu.";
+    return;
+  }
+
+  // ... lanjut render menu seperti sebelumnya
+}
     const kategoriSet = new Set();
     menuContainer.innerHTML = "";
 
