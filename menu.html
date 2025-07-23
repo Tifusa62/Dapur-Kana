@@ -290,15 +290,15 @@
 async function updateCheckoutToSupabase() {
   const keranjang = JSON.parse(localStorage.getItem("keranjang") || "{}");
 
-  const itemList = Object.entries(keranjang).map(([id, data]) => ({
-    id,
-    nama: data.nama,
-    qty: data.qty,
-    harga: data.harga
-  }));
-
-  const totalHarga = itemList.reduce((sum, item) => sum + item.qty * item.harga, 0);
-
+const itemList = Object.entries(keranjang).map(([id, data]) => ({
+  id: id,
+  nama: data.nama,
+  qty: data.qty,
+  harga: data.harga
+}));
+  const totalHarga = itemList.reduce((sum, item) => {
+  return sum + (item.qty * item.harga);
+}, 0);
   // Cek apakah ada entri dengan status 'draft'
   const { data: existing, error: checkError } = await supabase
     .from("checkout")
@@ -360,30 +360,41 @@ async function ensureDraftRow() {
 }
 // === Cart logic (localStorage) ===
 async function tambahItem(id, harga, nama) {
+  await ensureDraftRow(); // pastikan ada baris draft
 
   let qty = parseInt(document.getElementById("qty-" + id).innerText);
   qty++;
   document.getElementById("qty-" + id).innerText = qty;
 
   const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
-  cart[id] = cart[id] || { nama, harga, qty: 0 };
-  cart[id].qty = qty;
+
+  cart[id] = {
+    nama: nama,
+    harga: harga,
+    qty: qty
+  };
+
   localStorage.setItem("keranjang", JSON.stringify(cart));
 
   await updateCheckoutToSupabase();
 }
 
 async function kurangItem(id) {
+  await ensureDraftRow();
 
   let qty = parseInt(document.getElementById("qty-" + id).innerText);
   if (qty > 0) qty--;
   document.getElementById("qty-" + id).innerText = qty;
 
   const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
+
   if (cart[id]) {
     cart[id].qty = qty;
-    if (qty <= 0) delete cart[id];
+    if (qty <= 0) {
+      delete cart[id];
+    }
   }
+
   localStorage.setItem("keranjang", JSON.stringify(cart));
 
   await updateCheckoutToSupabase();
