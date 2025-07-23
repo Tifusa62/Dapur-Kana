@@ -25,7 +25,11 @@
       font-weight: bold;
     }
     .hamburger {
+      display: none;
       font-size: 28px;
+      height: 30px;
+      width: 30px;
+      align-items: left;
       cursor: pointer;
       background: none;
       border: none;
@@ -194,6 +198,7 @@
 
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("laporan").classList.remove("hidden");
+      document.querySelector(".hamburger").style.display = "block";
       renderCharts();
       loadMenu();
       loadBannerList();
