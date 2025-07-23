@@ -20,6 +20,14 @@
       align-items: center;
     }
 
+    .hamburger {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
     .title {
       font-size: 20px;
       font-weight: bold;
@@ -60,10 +68,11 @@
 
     .menu-card {
       background: white;
-      border-radius: 16px;
-      padding: 10px;
+      border-radius: 50px;
+      padding: 50px;
       text-align: center;
       cursor: pointer;
+      position: relative;
     }
 
     .menu-card img {
@@ -81,6 +90,24 @@
     .menu-card p {
       font-size: 14px;
       color: #555;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 8px;
+      gap: 10px;
+    }
+
+    .actions button {
+      background: #004d4d;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
     }
 
     .modal {
@@ -132,14 +159,26 @@
 </head>
 <body>
 
+<!-- Header -->
 <header>
+  <button class="hamburger" onclick="openSidebar()">☰</button>
   <div class="title">Menu</div>
   <div class="icons">
-    <a href="index.html">🏠</a>
     <a href="checkout.html">🛒</a>
     <a href="notifikasi.html">🔔</a>
   </div>
 </header>
+
+<!-- Sidebar -->
+<div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
+  <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
+  <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
+  <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
+  <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
+</div>
+
+<!-- Overlay -->
+<div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
 
 <main>
   <h2>Daftar Menu</h2>
@@ -168,7 +207,7 @@
 
   const supabase = createClient(
     "https://qcevidnjbsyjfdwfduiz.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   );
 
   const menuContainer = document.getElementById("menuContainer");
@@ -192,15 +231,23 @@
       div.setAttribute("data-kategori", item.kategori);
 
       div.innerHTML = `
-        <img src="${item.gambar_url}" />
+        <img src="${item.gambar_url}" alt="${item.nama}" />
         <h3>${item.nama}</h3>
         <p>Rp ${item.harga.toLocaleString()}</p>
+        <div class="actions">
+          <button onclick="kurangItem('${item.id}')">-</button>
+          <span id="qty-${item.id}">0</span>
+          <button onclick="tambahItem('${item.id}', ${item.harga}, '${item.nama}')">+</button>
+        </div>
       `;
-      div.addEventListener("click", () => showModal(item));
+      div.addEventListener("click", (e) => {
+        if (!e.target.closest(".actions")) {
+          showModal(item);
+        }
+      });
       menuContainer.appendChild(div);
     });
 
-    // Isi filter kategori
     kategoriSet.forEach(kat => {
       const option = document.createElement("option");
       option.value = kat;
@@ -227,6 +274,42 @@
 
   window.closeModal = () => {
     document.getElementById("menuModal").style.display = "none";
+  }
+
+  // Sidebar
+  window.openSidebar = () => {
+    document.getElementById("sidebar").style.left = "0";
+    document.getElementById("overlay").style.display = "block";
+  }
+
+  window.closeSidebar = () => {
+    document.getElementById("sidebar").style.left = "-250px";
+    document.getElementById("overlay").style.display = "none";
+  }
+
+  // === Cart logic (localStorage) ===
+  function tambahItem(id, harga, nama) {
+    let qty = parseInt(document.getElementById("qty-" + id).innerText);
+    qty++;
+    document.getElementById("qty-" + id).innerText = qty;
+
+    const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
+    cart[id] = cart[id] || { nama, harga, qty: 0 };
+    cart[id].qty = qty;
+    localStorage.setItem("keranjang", JSON.stringify(cart));
+  }
+
+  function kurangItem(id) {
+    let qty = parseInt(document.getElementById("qty-" + id).innerText);
+    if (qty > 0) qty--;
+    document.getElementById("qty-" + id).innerText = qty;
+
+    const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
+    if (cart[id]) {
+      cart[id].qty = qty;
+      if (qty <= 0) delete cart[id];
+      localStorage.setItem("keranjang", JSON.stringify(cart));
+    }
   }
 
   loadMenu();
