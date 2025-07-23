@@ -4,154 +4,185 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Checkout - Dapur Kana</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      padding: 16px;
+    }
+
+    h2 {
+      color: #004d4d;
+      text-align: center;
+    }
+
+    .checkout-items {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #ddd;
+      padding: 8px 0;
+    }
+
+    .total {
+      font-weight: bold;
+      text-align: right;
+      margin-top: 12px;
+    }
+
+    form {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 6px;
+    }
+
+    button {
+      margin-top: 16px;
+      background: #004d4d;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .note {
+      color: #888;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>Checkout</h1>
-  <nav>
-    <a href="index.html">Beranda</a> |
-    <a href="menu.html">Menu</a> |
-    <a href="checkout.html">Keranjang</a> |
-    <a href="notifikasi.html">Notifikasi</a> |
-    <a href="owner.html">Owner</a>
-  </nav>
-</header>
+<h2>Keranjang Anda</h2>
 
-<main>
-  <div id="keranjangContainer"></div>
-  <div id="totalContainer" style="padding:1rem; text-align:center;"></div>
+<div class="checkout-items" id="checkoutItems">Memuat...</div>
 
-  <form id="formCheckout" style="margin: 2rem;">
-    <h3>Data Pelanggan</h3>
-    <label>Nama:</label><br/>
-    <input type="text" id="nama" required><br/><br/>
+<h2>Data Pemesanan</h2>
+<form id="checkoutForm">
+  <label>Nama</label>
+  <input type="text" name="nama" required />
 
-    <label>No HP:</label><br/>
-    <input type="tel" id="hp" required><br/><br/>
+  <label>No HP</label>
+  <input type="text" name="no_hp" required />
 
-    <label>Alamat (boleh link titik Google Maps):</label><br/>
-    <textarea id="alamat" required></textarea><br/><br/>
+  <label>Alamat</label>
+  <input type="text" name="alamat" required />
 
-    <label>Pilih Pembayaran:</label><br/>
-    <select id="pembayaran" required>
-      <option value="">-- Pilih --</option>
-      <option value="QRIS">QRIS</option>
-      <option value="BCA">BCA</option>
-      <option value="Mandiri">Mandiri</option>
-      <option value="LinkAja">LinkAja</option>
-    </select><br/><br/>
+  <label>Pembayaran</label>
+  <select name="pembayaran" required>
+    <option value="">Pilih</option>
+    <option value="COD">COD</option>
+    <option value="Transfer">Transfer</option>
+  </select>
 
-    <button type="submit" style="padding: 0.75rem 1.5rem; background: green; color: white; border: none; border-radius: 0.5rem;">Bayar Sekarang</button>
-  </form>
-</main>
+  <button type="submit">Kirim Pesanan</button>
+  <div class="note">* Setelah dikirim, data keranjang akan dikunci.</div>
+</form>
 
-<footer>
-  <p>© 2025 Dapur Kana</p>
-</footer>
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-<script>
-  // GANTI dengan URL dan anon key milikmu
-  const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co'
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'; // gunakan key kamu
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  const supabase = createClient(
+    "https://qcevidnjbsyjfdwfduiz.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
+  );
 
-  const keranjangContainer = document.getElementById("keranjangContainer");
-  const totalContainer = document.getElementById("totalContainer");
+  const checkoutItems = document.getElementById("checkoutItems");
+  const form = document.getElementById("checkoutForm");
 
-  function renderKeranjang() {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    if (cart.length === 0) {
-      keranjangContainer.innerHTML = "<p style='text-align:center;'>Keranjang kosong.</p>";
-      totalContainer.innerHTML = "";
+  let currentId = null;
+  let currentItemList = [];
+  let totalHarga = 0;
+
+  async function loadCheckout() {
+    const { data, error } = await supabase
+      .from("checkout")
+      .select("*")
+      .eq("status", "draft")
+      .single();
+
+    if (error || !data) {
+      checkoutItems.innerHTML = "Keranjang kosong.";
       return;
     }
 
-    keranjangContainer.innerHTML = "<h3 style='text-align:center;'>Pesanan Anda</h3>";
-    let total = 0;
+    currentId = data.id;
+    currentItemList = data.item || [];
+    totalHarga = data.total_harga || 0;
 
-    cart.forEach((item) => {
-      const itemTotal = item.harga * item.qty;
-      total += itemTotal;
+    if (currentItemList.length === 0) {
+      checkoutItems.innerHTML = "Keranjang kosong.";
+      return;
+    }
+
+    checkoutItems.innerHTML = "";
+    currentItemList.forEach(item => {
       const div = document.createElement("div");
-      div.className = "menu-card";
+      div.className = "item";
       div.innerHTML = `
-        <p><strong>${item.nama}</strong><br>
-        Rp ${item.harga.toLocaleString()} x ${item.qty} = Rp ${itemTotal.toLocaleString()}</p>
+        <div>${item.nama} x ${item.qty}</div>
+        <div>Rp ${item.qty * item.harga}</div>
       `;
-      keranjangContainer.appendChild(div);
+      checkoutItems.appendChild(div);
     });
 
-    totalContainer.innerHTML = `Total: <strong>Rp ${total.toLocaleString()}</strong>`;
+    const total = document.createElement("div");
+    total.className = "total";
+    total.innerText = `Total: Rp ${totalHarga.toLocaleString()}`;
+    checkoutItems.appendChild(total);
   }
 
-  document.getElementById("formCheckout").addEventListener("submit", async function(e) {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const formData = new FormData(form);
+    const payload = {
+      nama: formData.get("nama"),
+      no_hp: formData.get("no_hp"),
+      alamat: formData.get("alamat"),
+      pembayaran: formData.get("pembayaran"),
+      status: "baru"
+    };
 
-    const nama = document.getElementById("nama").value.trim();
-    const hp = document.getElementById("hp").value.trim();
-    const alamat = document.getElementById("alamat").value.trim();
-    const pembayaran = document.getElementById("pembayaran").value;
-
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    if (cart.length === 0) {
-      alert("Keranjang kosong!");
-      return;
-    }
-
-    const { data, error } = await supabase.from("checkout").insert([{
-      nama: nama,
-      no_hp: hp,
-      alamat: alamat,
-      pembayaran: pembayaran,
-      keranjang: cart,
-      tanggal: new Date().toISOString()
-    }]);
+    const { error } = await supabase
+      .from("checkout")
+      .update(payload)
+      .eq("id", currentId);
 
     if (error) {
-      console.error("Gagal menyimpan ke Supabase:", error.message);
-      alert("Gagal menyimpan pesanan. Coba lagi.");
-      return;
+      alert("Gagal mengirim pesanan.");
+    } else {
+      alert("Pesanan berhasil dikirim!");
+      localStorage.removeItem("keranjang");
+      window.location.href = "notifikasi.html";
     }
-
-    localStorage.removeItem("cart");
-    window.location.href = "notifikasi.html";
   });
 
-  renderKeranjang();
+  loadCheckout();
 </script>
-
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  header, footer {
-    background: #f8f8f8;
-    text-align: center;
-    padding: 1rem;
-  }
-  main {
-    padding: 1rem;
-  }
-  .keranjang-item {
-    background: #fff;
-    margin: 1rem 0;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  input, textarea, select {
-    width: 100%;
-    padding: 0.5rem;
-    font-size: 1rem;
-    border-radius: 0.4rem;
-    border: 1px solid #ccc;
-  }
-</style>
 
 </body>
 </html>
