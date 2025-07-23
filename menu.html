@@ -214,12 +214,64 @@
   const filterSelect = document.getElementById("filterKategori");
 
   async function loadMenu() {
+  try {
     const { data, error } = await supabase.from("menu").select("*").order("nama");
 
-    if (error) {
-      menuContainer.innerHTML = "Gagal memuat menu.";
+    console.log("Data Menu:", data);
+    console.log("Error:", error);
+
+    if (error || !data || !Array.isArray(data)) {
+      menuContainer.innerHTML = "Gagal memuat menu. Periksa koneksi Supabase atau izin akses tabel.";
       return;
     }
+
+    if (data.length === 0) {
+      menuContainer.innerHTML = "Belum ada menu yang tersedia.";
+      return;
+    }
+
+    const kategoriSet = new Set();
+    menuContainer.innerHTML = "";
+
+    data.forEach(item => {
+      kategoriSet.add(item.kategori);
+
+      const div = document.createElement("div");
+      div.className = "menu-card";
+      div.setAttribute("data-kategori", item.kategori);
+
+      div.innerHTML = `
+        <img src="${item.gambar_url}" alt="${item.nama}" />
+        <h3>${item.nama}</h3>
+        <p>Rp ${item.harga.toLocaleString()}</p>
+        <div class="actions">
+          <button onclick="kurangItem('${item.id}')">-</button>
+          <span id="qty-${item.id}">0</span>
+          <button onclick="tambahItem('${item.id}', ${item.harga}, '${item.nama}')">+</button>
+        </div>
+      `;
+
+      div.addEventListener("click", (e) => {
+        if (!e.target.closest(".actions")) {
+          showModal(item);
+        }
+      });
+
+      menuContainer.appendChild(div);
+    });
+
+    // Tambahkan opsi filter kategori
+    kategoriSet.forEach(kat => {
+      const option = document.createElement("option");
+      option.value = kat;
+      option.textContent = kat;
+      filterSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error umum:", err);
+    menuContainer.innerHTML = "Terjadi kesalahan saat memuat menu.";
+  }
+}
 
     const kategoriSet = new Set();
     menuContainer.innerHTML = "";
