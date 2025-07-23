@@ -287,8 +287,61 @@
     document.getElementById("overlay").style.display = "none";
   }
 
+async function updateCheckoutToSupabase() {
+  const keranjang = JSON.parse(localStorage.getItem("keranjang") || "{}");
+
+  const itemList = Object.entries(keranjang).map(([id, data]) => ({
+    id,
+    nama: data.nama,
+    qty: data.qty,
+    harga: data.harga
+  }));
+
+  const totalHarga = itemList.reduce((sum, item) => sum + item.qty * item.harga, 0);
+
+  // Cek apakah ada entri dengan status 'draft'
+  const { data: existing, error: checkError } = await supabase
+    .from("checkout")
+    .select("id")
+    .eq("status", "draft")
+    .maybeSingle();
+
+  if (checkError) {
+    console.error("Gagal cek draft checkout:", checkError.message);
+    return;
+  }
+
+  if (existing) {
+    // Jika sudah ada, lakukan update
+    const { error: updateError } = await supabase
+      .from("checkout")
+      .update({
+        item: JSON.stringify(itemList),
+        total_harga: totalHarga
+      })
+      .eq("id", existing.id);
+
+    if (updateError) {
+      console.error("Gagal update checkout:", updateError.message);
+    }
+  } else {
+    // Jika belum ada, insert baru
+    const { error: insertError } = await supabase
+      .from("checkout")
+      .insert([{
+        item: JSON.stringify(itemList),
+        total_harga: totalHarga,
+        status: "draft",
+        created_at: new Date().toISOString()
+      }]);
+
+    if (insertError) {
+      console.error("Gagal insert checkout:", insertError.message);
+    }
+  }
+}
 // === Cart logic (localStorage) ===
-function tambahItem(id, harga, nama) {
+async function tambahItem(id, harga, nama) {
   let qty = parseInt(document.getElementById("qty-" + id).innerText);
   qty++;
   document.getElementById("qty-" + id).innerText = qty;
@@ -297,9 +350,11 @@ function tambahItem(id, harga, nama) {
   cart[id] = cart[id] || { nama, harga, qty: 0 };
   cart[id].qty = qty;
   localStorage.setItem("keranjang", JSON.stringify(cart));
+
+  await updateCheckoutToSupabase();
 }
 
-function kurangItem(id) {
+async function kurangItem(id) {
   let qty = parseInt(document.getElementById("qty-" + id).innerText);
   if (qty > 0) qty--;
   document.getElementById("qty-" + id).innerText = qty;
@@ -308,8 +363,10 @@ function kurangItem(id) {
   if (cart[id]) {
     cart[id].qty = qty;
     if (qty <= 0) delete cart[id];
-    localStorage.setItem("keranjang", JSON.stringify(cart));
   }
+  localStorage.setItem("keranjang", JSON.stringify(cart));
+
+  await updateCheckoutToSupabase();
 }
 
 // ✅ Agar bisa dipanggil dari HTML
