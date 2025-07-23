@@ -41,63 +41,38 @@
 
     main {
       padding: 16px;
-    }
-
-    h2 {
       color: white;
-      text-align: center;
     }
 
-    .checkout-items, form {
-      background: white;
-      padding: 16px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-    }
-
-    .item {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid #ddd;
-      padding: 8px 0;
-    }
-
-    .total {
-      font-weight: bold;
-      text-align: right;
-      margin-top: 12px;
-    }
-
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-
-    input, select {
+    form input, form textarea, form select {
       width: 100%;
+      margin-bottom: 12px;
       padding: 10px;
-      border: 1px solid #ccc;
+      border: none;
       border-radius: 8px;
-      margin-top: 6px;
     }
 
-    button {
-      margin-top: 16px;
+    form button {
       background: #004d4d;
       color: white;
-      padding: 10px;
-      width: 100%;
+      padding: 10px 16px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
     }
 
-    .note {
-      color: #888;
-      font-size: 12px;
-      margin-top: 6px;
+    .keranjang-item {
+      background: white;
+      color: black;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    #totalHarga {
+      font-weight: bold;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -108,7 +83,6 @@
   <button class="hamburger" onclick="openSidebar()">☰</button>
   <div class="title">Checkout</div>
   <div class="icons">
-    <a href="checkout.html">🛒</a>
     <a href="notifikasi.html">🔔</a>
   </div>
 </header>
@@ -120,111 +94,100 @@
   <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
   <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
 </div>
-
-<!-- Overlay -->
 <div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
 
 <main>
   <h2>Keranjang Anda</h2>
-  <div class="checkout-items" id="checkoutItems">Memuat...</div>
+  <div id="keranjangList">Memuat...</div>
+  <p id="totalHarga"></p>
 
-  <h2>Data Pemesanan</h2>
+  <h3>Isi Data Pemesan</h3>
   <form id="checkoutForm">
-    <label>Nama</label>
-    <input type="text" name="nama" required />
-
-    <label>No HP</label>
-    <input type="text" name="no_hp" required />
-
-    <label>Alamat</label>
-    <input type="text" name="alamat" required />
-
-    <label>Pembayaran</label>
-    <select name="pembayaran" required>
-      <option value="">Pilih</option>
+    <input type="text" id="nama" placeholder="Nama Anda" required />
+    <input type="text" id="no_hp" placeholder="No. HP" required />
+    <textarea id="alamat" placeholder="Alamat Lengkap" required></textarea>
+    <select id="pembayaran" required>
+      <option value="">Pilih Metode Pembayaran</option>
       <option value="COD">COD</option>
       <option value="Transfer">Transfer</option>
     </select>
-
     <button type="submit">Kirim Pesanan</button>
-    <div class="note">* Setelah dikirim, data keranjang akan dikunci.</div>
   </form>
 </main>
 
 <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
   const supabase = createClient(
     "https://qcevidnjbsyjfdwfduiz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
   );
 
-  const checkoutItems = document.getElementById("checkoutItems");
-  const form = document.getElementById("checkoutForm");
+  const keranjangList = document.getElementById("keranjangList");
+  const totalHargaEl = document.getElementById("totalHarga");
 
-  let currentId = null;
-  let currentItemList = [];
-  let totalHarga = 0;
+  let currentCheckoutId = null;
 
-  async function loadCheckout() {
+  async function loadDraftCheckout() {
     const { data, error } = await supabase
       .from("checkout")
       .select("*")
       .eq("status", "draft")
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
-      checkoutItems.innerHTML = "Keranjang kosong.";
+      keranjangList.innerHTML = "Keranjang kosong.";
       return;
     }
 
-    currentId = data.id;
-    currentItemList = data.item || [];
-    totalHarga = data.total_harga || 0;
+    currentCheckoutId = data.id;
 
-    if (currentItemList.length === 0) {
-      checkoutItems.innerHTML = "Keranjang kosong.";
-      return;
+    const items = JSON.parse(data.item || "[]");
+    if (items.length === 0) {
+      keranjangList.innerHTML = "Keranjang kosong.";
+    } else {
+      keranjangList.innerHTML = "";
+      let total = 0;
+      items.forEach(item => {
+        total += item.harga * item.qty;
+        keranjangList.innerHTML += `
+          <div class="keranjang-item">
+            <strong>${item.nama}</strong><br/>
+            Qty: ${item.qty} x Rp${item.harga.toLocaleString()} = Rp${(item.qty * item.harga).toLocaleString()}
+          </div>
+        `;
+      });
+      totalHargaEl.textContent = "Total: Rp" + total.toLocaleString();
     }
-
-    checkoutItems.innerHTML = "";
-    currentItemList.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <div>${item.nama} x ${item.qty}</div>
-        <div>Rp ${item.qty * item.harga}</div>
-      `;
-      checkoutItems.appendChild(div);
-    });
-
-    const total = document.createElement("div");
-    total.className = "total";
-    total.innerText = `Total: Rp ${totalHarga.toLocaleString()}`;
-    checkoutItems.appendChild(total);
   }
 
-  form.addEventListener("submit", async (e) => {
+  document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const formData = new FormData(form);
-    const payload = {
-      nama: formData.get("nama"),
-      no_hp: formData.get("no_hp"),
-      alamat: formData.get("alamat"),
-      pembayaran: formData.get("pembayaran"),
-      status: "baru"
-    };
+
+    const nama = document.getElementById("nama").value;
+    const no_hp = document.getElementById("no_hp").value;
+    const alamat = document.getElementById("alamat").value;
+    const pembayaran = document.getElementById("pembayaran").value;
+
+    if (!currentCheckoutId) {
+      alert("Tidak ada data checkout yang bisa dikirim.");
+      return;
+    }
 
     const { error } = await supabase
       .from("checkout")
-      .update(payload)
-      .eq("id", currentId);
+      .update({
+        nama,
+        no_hp,
+        alamat,
+        pembayaran,
+        status: "menunggu"
+      })
+      .eq("id", currentCheckoutId);
 
     if (error) {
       alert("Gagal mengirim pesanan.");
     } else {
       alert("Pesanan berhasil dikirim!");
-      localStorage.removeItem("keranjang");
       window.location.href = "notifikasi.html";
     }
   });
@@ -239,7 +202,7 @@
     document.getElementById("overlay").style.display = "none";
   }
 
-  loadCheckout();
+  loadDraftCheckout();
 </script>
 
 </body>
