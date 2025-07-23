@@ -348,7 +348,7 @@ async function ensureDraftRow() {
     .eq("status", "draft")
     .maybeSingle();
 
-  if (!data) {
+  if (!data && !error) {
     const { error: insertError } = await supabase
       .from("checkout")
       .insert([{ status: "draft", item: [], total_harga: 0 }]);
@@ -360,7 +360,6 @@ async function ensureDraftRow() {
 }
 // === Cart logic (localStorage) ===
 async function tambahItem(id, harga, nama) {
-  await ensureDraftRow(); // pastikan draft tersedia
 
   let qty = parseInt(document.getElementById("qty-" + id).innerText);
   qty++;
@@ -375,7 +374,6 @@ async function tambahItem(id, harga, nama) {
 }
 
 async function kurangItem(id) {
-  await ensureDraftRow();
 
   let qty = parseInt(document.getElementById("qty-" + id).innerText);
   if (qty > 0) qty--;
@@ -395,7 +393,19 @@ async function kurangItem(id) {
 window.tambahItem = tambahItem;
 window.kurangItem = kurangItem;
 
-  loadMenu();
+
+function renderQtyFromCart() {
+  const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
+  for (const [id, data] of Object.entries(cart)) {
+    const qtySpan = document.getElementById("qty-" + id);
+    if (qtySpan) {
+      qtySpan.textContent = data.qty;
+    }
+  }
+}
+
+// Panggil sekali saja saat awal
+await ensureDraftRow();
 </script>
 
 </body>
