@@ -153,9 +153,9 @@
     <!-- Edit Banners -->
     <section id="editBanner" class="hidden">
       <h2>Edit Banners</h2>
-      <input type="file" id="bannerUpload" />
-      <button onclick="uploadBanner()">Upload Banner</button>
-      <div id="bannerList"></div>
+      <input type="file" id="bannerUpload" accept="image/*" />
+<button id="uploadBannerBtn">Upload Banner</button>
+<div id="bannerList" style="margin-top: 1rem;"></div>
     </section>
   </main>
 
@@ -280,34 +280,87 @@
     }
 
     // Banner
-    window.uploadBanner = async () => {
-      const file = document.getElementById("bannerUpload").files[0];
-      if (!file) return alert("Pilih gambar dulu");
-      const path = `${Date.now()}-${file.name}`;
-      await supabase.storage.from("banner").upload(path, file);
-      const { data } = supabase.storage.from("banner").getPublicUrl(path);
-      await supabase.from("banners").insert({ url: data.publicUrl });
-      loadBannerList();
-    }
+    const bannerInput = document.getElementById("bannerUpload");
+const bannerList = document.getElementById("bannerList");
+const uploadBtn = document.getElementById("uploadBannerBtn");
 
-    async function loadBannerList() {
-      const { data } = await supabase.from("banners").select("*");
-      const list = document.getElementById("bannerList");
-      list.innerHTML = "";
-      data.forEach(item => {
-        const div = document.createElement("div");
-        div.innerHTML = `<img src="${item.url}" /><br/>
-        <button onclick="deleteBanner(${item.id}, '${item.url}')">Hapus</button>`;
-        list.appendChild(div);
-      });
-    }
+uploadBtn.addEventListener("click", async () => {
+  const file = bannerInput.files[0];
+  if (!file) {
+    alert("Pilih gambar terlebih dahulu.");
+    return;
+  }
 
-    window.deleteBanner = async (id, url) => {
-      const file = url.split("/").pop().split("?")[0];
-      await supabase.storage.from("banner").remove([file]);
-      await supabase.from("banners").delete().eq("id", id);
-      loadBannerList();
-    }
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}.${fileExt}`;
+  const filePath = fileName;
+
+  // Upload ke Supabase Storage
+  const { data: uploadData, error: uploadError } = await supabase
+    .storage
+    .from("banners")
+    .upload(filePath, file);
+
+  if (uploadError) {
+    alert("Gagal upload ke storage: " + uploadError.message);
+    return;
+  }
+
+  // Ambil public URL
+  const { data: publicURL } = supabase
+    .storage
+    .from("banners")
+    .getPublicUrl(filePath);
+
+  // Simpan URL ke tabel banners
+  const { error: dbError } = await supabase
+    .from("banners")
+    .insert([{ url: publicURL.publicUrl }]);
+
+  if (dbError) {
+    alert("Gagal simpan ke database: " + dbError.message);
+  } else {
+    alert("Berhasil upload banner!");
+    loadBannerList();
+  }
+});
+
+async function loadBannerList() {
+  bannerList.innerHTML = "Memuat...";
+
+  const { data, error } = await supabase
+    .from("banners")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    bannerList.innerHTML = "Gagal memuat banner.";
+    return;
+  }
+
+  bannerList.innerHTML = "";
+  data.forEach(b => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <img src="${b.url}" style="max-width: 100%; border-radius: 12px;" />
+      <button onclick="hapusBanner(${b.id})">Hapus</button>
+      <hr />
+    `;
+    bannerList.appendChild(div);
+  });
+}
+
+window.hapusBanner = async (id) => {
+  const { error } = await supabase.from("banners").delete().eq("id", id);
+  if (!error) {
+    alert("Banner dihapus");
+    loadBannerList();
+  } else {
+    alert("Gagal hapus banner");
+  }
+};
+
+loadBannerList();
   </script>
 </body>
 </html>
