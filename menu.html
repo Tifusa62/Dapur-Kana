@@ -405,7 +405,8 @@ function renderQtyFromCart() {
 }
 
 // Panggil sekali saja saat awal
-await ensureDraftRow();
+await loadMenu();
+renderQtyFromCart();
 </script>
 
 </body>
