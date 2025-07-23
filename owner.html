@@ -364,7 +364,7 @@ async function loadBannerList() {
     div.innerHTML = `
       <img src="${b.url}" style="max-width: 100%; border-radius: 12px;" />
       <p><strong>${b.judul}</strong><br><small>${b.subjudul}</small></p>
-      <button onclick='hapusBanner(${b.id})'>Hapus</button>
+      <button onclick='hapusBanner("${b.id}")'>Hapus</button>
       <hr />
     `;
     bannerList.appendChild(div);
@@ -372,6 +372,7 @@ async function loadBannerList() {
 }
 
 window.hapusBanner = async (id) => {
+  console.log("Menghapus banners ID:",id);
   const { error } = await supabase.from("banners").delete().eq("id", id);
   if (!error) {
     alert("Banner berhasil dihapus");
