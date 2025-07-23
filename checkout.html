@@ -6,17 +6,49 @@
   <title>Checkout - Dapur Kana</title>
   <style>
     body {
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f0f0;
+      background: #00cfd3;
+    }
+
+    header {
+      background: #004d4d;
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hamburger {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .icons a {
+      color: white;
+      text-decoration: none;
+      margin-left: 12px;
+    }
+
+    main {
       padding: 16px;
     }
 
     h2 {
-      color: #004d4d;
+      color: white;
       text-align: center;
     }
 
-    .checkout-items {
+    .checkout-items, form {
       background: white;
       padding: 16px;
       border-radius: 12px;
@@ -34,12 +66,6 @@
       font-weight: bold;
       text-align: right;
       margin-top: 12px;
-    }
-
-    form {
-      background: white;
-      padding: 16px;
-      border-radius: 12px;
     }
 
     label {
@@ -77,31 +103,53 @@
 </head>
 <body>
 
-<h2>Keranjang Anda</h2>
+<!-- Header -->
+<header>
+  <button class="hamburger" onclick="openSidebar()">☰</button>
+  <div class="title">Checkout</div>
+  <div class="icons">
+    <a href="checkout.html">🛒</a>
+    <a href="notifikasi.html">🔔</a>
+  </div>
+</header>
 
-<div class="checkout-items" id="checkoutItems">Memuat...</div>
+<!-- Sidebar -->
+<div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
+  <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
+  <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
+  <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
+  <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
+</div>
 
-<h2>Data Pemesanan</h2>
-<form id="checkoutForm">
-  <label>Nama</label>
-  <input type="text" name="nama" required />
+<!-- Overlay -->
+<div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
 
-  <label>No HP</label>
-  <input type="text" name="no_hp" required />
+<main>
+  <h2>Keranjang Anda</h2>
+  <div class="checkout-items" id="checkoutItems">Memuat...</div>
 
-  <label>Alamat</label>
-  <input type="text" name="alamat" required />
+  <h2>Data Pemesanan</h2>
+  <form id="checkoutForm">
+    <label>Nama</label>
+    <input type="text" name="nama" required />
 
-  <label>Pembayaran</label>
-  <select name="pembayaran" required>
-    <option value="">Pilih</option>
-    <option value="COD">COD</option>
-    <option value="Transfer">Transfer</option>
-  </select>
+    <label>No HP</label>
+    <input type="text" name="no_hp" required />
 
-  <button type="submit">Kirim Pesanan</button>
-  <div class="note">* Setelah dikirim, data keranjang akan dikunci.</div>
-</form>
+    <label>Alamat</label>
+    <input type="text" name="alamat" required />
+
+    <label>Pembayaran</label>
+    <select name="pembayaran" required>
+      <option value="">Pilih</option>
+      <option value="COD">COD</option>
+      <option value="Transfer">Transfer</option>
+    </select>
+
+    <button type="submit">Kirim Pesanan</button>
+    <div class="note">* Setelah dikirim, data keranjang akan dikunci.</div>
+  </form>
+</main>
 
 <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -180,6 +228,16 @@
       window.location.href = "notifikasi.html";
     }
   });
+
+  window.openSidebar = () => {
+    document.getElementById("sidebar").style.left = "0";
+    document.getElementById("overlay").style.display = "block";
+  }
+
+  window.closeSidebar = () => {
+    document.getElementById("sidebar").style.left = "-250px";
+    document.getElementById("overlay").style.display = "none";
+  }
 
   loadCheckout();
 </script>
