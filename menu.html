@@ -340,8 +340,28 @@ async function updateCheckoutToSupabase() {
     }
   }
 }
+// Pastikan baris dengan status 'draft' tersedia sebelum update
+async function ensureDraftRow() {
+  const { data, error } = await supabase
+    .from("checkout")
+    .select("id")
+    .eq("status", "draft")
+    .maybeSingle();
+
+  if (!data) {
+    const { error: insertError } = await supabase
+      .from("checkout")
+      .insert([{ status: "draft", item: [], total_harga: 0 }]);
+
+    if (insertError) {
+      console.error("Gagal membuat draft checkout:", insertError.message);
+    }
+  }
+}
 // === Cart logic (localStorage) ===
 async function tambahItem(id, harga, nama) {
+  await ensureDraftRow(); // pastikan draft tersedia
+
   let qty = parseInt(document.getElementById("qty-" + id).innerText);
   qty++;
   document.getElementById("qty-" + id).innerText = qty;
@@ -355,6 +375,8 @@ async function tambahItem(id, harga, nama) {
 }
 
 async function kurangItem(id) {
+  await ensureDraftRow();
+
   let qty = parseInt(document.getElementById("qty-" + id).innerText);
   if (qty > 0) qty--;
   document.getElementById("qty-" + id).innerText = qty;
