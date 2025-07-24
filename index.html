@@ -146,14 +146,13 @@
 <body>
 
 <!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-  <a href="index.html">Beranda</a>
-  <a href="menu.html">Menu</a>
-  <a href="checkout.html">Keranjang</a>
-  <a href="notifikasi.html">Notifikasi</a>
-</div>
-<div class="overlay" id="overlay"></div>
-
+<div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
+    <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
+    <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
+    <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
+    <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
+  </div>
+  <div class="overlay" id="overlay"></div>
 <!-- Header -->
 <header>
   <button id="menuToggle" class="hamburger">☰</button>
