@@ -90,6 +90,11 @@
       font-weight: bold;
       margin-top: 10px;
     }
+
+    .hapus-btn {
+      background: crimson;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -116,6 +121,7 @@
 <main>
   <h2>Keranjang</h2>
   <div class="keranjang-list" id="keranjangList">Memuat...</div>
+  <button class="hapus-btn" onclick="hapusKeranjang()">🗑 Hapus Keranjang</button>
 
   <h2>Data Pemesan</h2>
   <div class="form-container">
@@ -127,7 +133,7 @@
       <option value="COD">COD (Bayar di tempat)</option>
       <option value="Transfer">Transfer</option>
     </select>
-    <button onclick="submitPesanan()">Kirim Pesanan</button>
+    <button onclick="submitPesanan()">📦 Kirim Pesanan</button>
   </div>
 </main>
 
@@ -180,7 +186,7 @@
       return;
     }
 
-    const { data: checkout } = await supabase
+    const { data: checkout, error } = await supabase
       .from("checkout")
       .select("*")
       .eq("user_id", user_id)
@@ -193,7 +199,7 @@
       return;
     }
 
-    const { error } = await supabase.from("pesanan").insert([{
+    const { error: insertError } = await supabase.from("pesanan").insert([{
       nama, no_hp, alamat, metode,
       items: checkout.item,
       total_harga: checkout.total_harga,
@@ -201,13 +207,22 @@
       user_id
     }]);
 
-    if (error) {
-      alert("Gagal mengirim pesanan.");
+    if (insertError) {
+      alert("❌ Gagal mengirim pesanan.");
     } else {
       await supabase.from("checkout").delete().eq("user_id", user_id);
-      alert("Pesanan berhasil dikirim!");
+      alert("✅ Pesanan berhasil dikirim!");
       window.location.href = "notifikasi.html";
     }
+  }
+
+  async function hapusKeranjang() {
+    const konfirmasi = confirm("Yakin ingin menghapus keranjang?");
+    if (!konfirmasi) return;
+
+    await supabase.from("checkout").delete().eq("user_id", user_id);
+    alert("Keranjang berhasil dihapus.");
+    location.reload();
   }
 
   window.openSidebar = () => {
@@ -222,5 +237,6 @@
 
   loadKeranjang();
 </script>
+
 </body>
 </html>
