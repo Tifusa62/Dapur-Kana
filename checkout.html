@@ -11,29 +11,37 @@
       background: #00cfd3;
     }
     header {
-      background: #004d4d;
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  background: #004d4d;
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
     .hamburger {
-      font-size: 24px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .icons {
-      display: flex;
-      align-items: Center;
-      gap: 10px;
-    }
+  position: absolute;
+  left: 16px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.title {
+  margin: 0 auto;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.icons {
+  position: absolute;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
     .icons a {
       color: white;
       text-decoration: none;
@@ -97,13 +105,13 @@
 </head>
 <body>
   <header>
-    <button class="hamburger" onclick="openSidebar()">☰</button>
-    <div class="title">Checkout</div>
-    <div class="icons">
-      <a href="checkout.html">🛒</a>
-      <a href="notifikasi.html">🔔</a>
-    </div>
-  </header>
+  <button class="hamburger" onclick="openSidebar()">☰</button>
+  <div class="title">Checkout</div>
+  <div class="icons">
+    <a href="checkout.html">🛒</a>
+    <a href="notifikasi.html">🔔</a>
+  </div>
+</header>
   <div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
     <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
     <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
