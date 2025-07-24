@@ -162,28 +162,24 @@ async function loadKeranjang() {
         <div>${item.nama}</div>
         <div class="qty-control">
           <button onclick="kurangItem('${item.id}')">-</button>
-          <span id="qty-${item.id}">${item.qty}</span>
-          <button onclick="tambahItem('${item.id}')">+</button>
+          <span id="qty-${index}">${item.qty}</span>
+<button onclick="tambahItem(${index})">+</button>
         </div>
         <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
       </div>`;
   }).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
 }
 
-window.tambahItem = async function (id) {
+window.tambahItem = async function (index) {
   const items = checkoutData.item;
-  const index = items.findIndex(i => i.id === id);
-  if (index >= 0) items[index].qty++;
+  items[index].qty++;
   updateCheckout(items);
 };
 
-window.kurangItem = async function (id) {
-  let items = checkoutData.item;
-  const index = items.findIndex(i => i.id === id);
-  if (index >= 0) {
-    items[index].qty--;
-    if (items[index].qty <= 0) items.splice(index, 1);
-  }
+window.kurangItem = async function (index) {
+  const items = checkoutData.item;
+  items[index].qty--;
+  if (items[index].qty <= 0) items.splice(index, 1);
   updateCheckout(items);
 };
 
