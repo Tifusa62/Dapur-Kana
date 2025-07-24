@@ -20,13 +20,13 @@
       align-items: center;
     }
 
-    .hamburger {
-      font-size: 24px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
+.hamburger {
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
 
     .title {
       font-size: 20px;
@@ -178,45 +178,49 @@
     }).join("") + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
   }
 
-  async function submitPesanan() {
-    const nama = document.getElementById("nama").value;
-    const no_hp = document.getElementById("no_hp").value;
-    const alamat = document.getElementById("alamat").value;
-    const metode = document.getElementById("metode").value;
+async function submitPesanan() {
+  const nama = document.getElementById("nama").value.trim();
+  const no_hp = document.getElementById("no_hp").value.trim();
+  const alamat = document.getElementById("alamat").value.trim();
+  const metode = document.getElementById("metode").value;
 
-    const { data: checkoutData } = await supabase
-      .from("checkout")
-      .select("*")
-      .eq("user_id", user_id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) {
-      alert("Keranjang kosong.");
-      return;
-    }
-
-    const { error } = await supabase.from("pesanan").insert([{
-      nama,
-      no_hp,
-      alamat,
-      metode,
-      items: checkoutData.item,
-      total: checkoutData.total_harga,
-      status: "Menunggu",
-      user_id
-    }]);
-
-    if (error) {
-      alert("Gagal kirim pesanan.");
-    } else {
-      alert("Pesanan berhasil dikirim!");
-      // opsional: hapus dari checkout setelah kirim
-      await supabase.from("checkout").delete().eq("user_id", user_id);
-      location.reload();
-    }
+  if (!nama || !no_hp || !alamat || !metode) {
+    alert("Mohon lengkapi semua data pemesanan.");
+    return;
   }
+
+  const { data: checkoutData, error: cekError } = await supabase
+    .from("checkout")
+    .select("*")
+    .eq("user_id", user_id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (cekError || !checkoutData || !checkoutData.item || checkoutData.item.length === 0) {
+    alert("Keranjang kosong atau gagal memuat.");
+    return;
+  }
+
+  const { error } = await supabase.from("pesanan").insert([{
+    user_id,
+    nama,
+    no_hp,
+    alamat,
+    metode,
+    items: checkoutData.item,
+    total_harga: checkoutData.total_harga, // Sesuaikan dengan nama kolom
+    status: "Menunggu"
+  }]);
+
+  if (error) {
+    alert("Gagal kirim pesanan: " + error.message);
+  } else {
+    alert("Pesanan berhasil dikirim!");
+    await supabase.from("checkout").delete().eq("user_id", user_id);
+    window.location.href = "notifikasi.html";
+  }
+}
 
   // Sidebar
   window.openSidebar = () => {
