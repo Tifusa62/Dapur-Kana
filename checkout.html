@@ -208,7 +208,20 @@ window.submitPesanan = async function () {
     status: 'Menunggu',
     user_id
   });
+  if (error) return alert('Gagal kirim pesanan.');
+  await supabase.from('checkout').delete().eq('id', checkoutData.id);
+  alert('Pesanan berhasil dikirim!');
+  window.location.reload();
+};
 
+window.openSidebar = () => {
+  document.getElementById("sidebar").style.left = "0";
+  document.getElementById("overlay").style.display = "block";
+};
+window.closeSidebar = () => {
+  document.getElementById("sidebar").style.left = "-250px";
+  document.getElementById("overlay").style.display = "none";
+};
 const infoPembayaranDiv = document.getElementById("infoPembayaran");
 
 document.getElementById("metode").addEventListener("change", async (e) => {
@@ -238,21 +251,6 @@ document.getElementById("metode").addEventListener("change", async (e) => {
     `;
   }
 });
-  if (error) return alert('Gagal kirim pesanan.');
-  await supabase.from('checkout').delete().eq('id', checkoutData.id);
-  alert('Pesanan berhasil dikirim!');
-  window.location.reload();
-};
-
-window.openSidebar = () => {
-  document.getElementById("sidebar").style.left = "0";
-  document.getElementById("overlay").style.display = "block";
-};
-window.closeSidebar = () => {
-  document.getElementById("sidebar").style.left = "-250px";
-  document.getElementById("overlay").style.display = "none";
-};
-
 loadKeranjang();
 </script>
 </body>
