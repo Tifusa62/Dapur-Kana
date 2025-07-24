@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -9,190 +8,174 @@
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #00cfd3;
-    }
+    }header {
+  background: #004d4d;
+  color: white;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    header {
-      background: #004d4d;
-      color: white;
-      padding: 10px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.hamburger {
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
 
-    .hamburger {
-      font-size: 24px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
+.title {
+  font-size: 20px;
+  font-weight: bold;
+}
 
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-    }
+.icons a {
+  color: white;
+  text-decoration: none;
+  margin-left: 12px;
+}
 
-    .icons a {
-      color: white;
-      text-decoration: none;
-      margin-left: 12px;
-    }
+main {
+  padding: 16px;
+}
 
-    main {
-      padding: 16px;
-    }
+h2 {
+  color: white;
+  text-align: center;
+}
 
-    h2 {
-      color: white;
-      text-align: center;
-    }
+.filter-container {
+  text-align: center;
+  margin-bottom: 16px;
+}
 
-    .filter-container {
-      text-align: center;
-      margin-bottom: 16px;
-    }
+select {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+}
 
-    select {
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-    }
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
 
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
-    }
+.menu-card {
+  background: white;
+  border-radius: 16px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+}
 
-    .menu-card {
-      background: white;
-      border-radius: 16px;
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      position: relative;
-    }
+.menu-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+}
 
-    .menu-card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 12px;
-    }
+.menu-card h3 {
+  margin: 10px 0 4px;
+  font-size: 16px;
+}
 
-    .menu-card h3 {
-      margin: 10px 0 4px;
-      font-size: 16px;
-    }
+.menu-card p {
+  font-size: 14px;
+  color: #555;
+}
 
-    .menu-card p {
-      font-size: 14px;
-      color: #555;
-    }
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+  gap: 10px;
+}
 
-    .actions {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 8px;
-      gap: 10px;
-    }
+.actions button {
+  background: #004d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+}
 
-    .actions button {
-      background: #004d4d;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 8px;
-      font-size: 18px;
-      cursor: pointer;
-    }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+}
 
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      justify-content: center;
-      align-items: center;
-    }
+.modal-content {
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 16px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  text-align: center;
+}
 
-    .modal-content {
-      background: white;
-      color: black;
-      padding: 20px;
-      border-radius: 16px;
-      max-width: 90%;
-      max-height: 90%;
-      overflow: auto;
-      text-align: center;
-    }
+.modal-content img {
+  max-width: 100%;
+  border-radius: 12px;
+}
 
-    .modal-content img {
-      max-width: 100%;
-      border-radius: 12px;
-    }
+.modal-content h3 {
+  margin-top: 12px;
+}
 
-    .modal-content h3 {
-      margin-top: 12px;
-    }
+.modal-content p {
+  color: #333;
+}
 
-    .modal-content p {
-      color: #333;
-    }
+.close-btn {
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: #004d4d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
-    .close-btn {
-      margin-top: 12px;
-      padding: 10px 20px;
-      background: #004d4d;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
   </style>
 </head>
-<body>
-
-<!-- Header -->
-<header>
+<body><header>
   <button class="hamburger" onclick="openSidebar()">☰</button>
   <div class="title">Menu</div>
   <div class="icons">
     <a href="checkout.html">🛒</a>
     <a href="notifikasi.html">🔔</a>
   </div>
-</header>
-
-<!-- Sidebar -->
-<div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
+</header><div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
   <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
   <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
   <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
   <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
-</div>
-
-<!-- Overlay -->
-<div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
-
-<main>
+</div><div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div><main>
   <h2>Daftar Menu</h2>
   <div class="filter-container">
     <select id="filterKategori">
       <option value="">Semua Kategori</option>
     </select>
   </div>
-
   <div class="menu-grid" id="menuContainer">Memuat menu...</div>
-</main>
-
-<!-- Modal -->
-<div id="menuModal" class="modal" onclick="closeModal()">
+</main><div id="menuModal" class="modal" onclick="closeModal()">
   <div class="modal-content" onclick="event.stopPropagation()">
     <img id="modalImg" src="" />
     <h3 id="modalNama"></h3>
@@ -200,15 +183,16 @@
     <p id="modalHarga"></p>
     <button class="close-btn" onclick="closeModal()">Tutup</button>
   </div>
-</div>
-
-<script type="module">
+</div><script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
   const supabase = createClient(
     "https://qcevidnjbsyjfdwfduiz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
   );
+
+  const userId = localStorage.getItem("user_id") || crypto.randomUUID();
+  localStorage.setItem("user_id", userId);
 
   const menuContainer = document.getElementById("menuContainer");
   const filterSelect = document.getElementById("filterKategori");
@@ -276,7 +260,6 @@
     document.getElementById("menuModal").style.display = "none";
   }
 
-  // Sidebar
   window.openSidebar = () => {
     document.getElementById("sidebar").style.left = "0";
     document.getElementById("overlay").style.display = "block";
@@ -287,138 +270,67 @@
     document.getElementById("overlay").style.display = "none";
   }
 
-async function updateCheckoutToSupabase() {
-  const keranjang = JSON.parse(localStorage.getItem("keranjang") || "{}");
-
-const itemList = Object.entries(keranjang).map(([id, data]) => ({
-  id: id,
-  nama: data.nama,
-  qty: data.qty,
-  harga: data.harga
-}));
-  const totalHarga = itemList.reduce((sum, item) => {
-  return sum + (item.qty * item.harga);
-}, 0);
-  // Cek apakah ada entri dengan status 'draft'
-  const { data: existing, error: checkError } = await supabase
-    .from("checkout")
-    .select("id")
-    .eq("status", "draft")
-    .maybeSingle();
-
-  if (checkError) {
-    console.error("Gagal cek draft checkout:", checkError.message);
-    return;
-  }
-
-  if (existing) {
-    // Jika sudah ada, lakukan update
-    const { error: updateError } = await supabase
-      .from("checkout")
-      .update({
-        item: JSON.stringify(itemList),
-        total_harga: totalHarga
-      })
-      .eq("id", existing.id);
-
-    if (updateError) {
-      console.error("Gagal update checkout:", updateError.message);
-    }
-  } else {
-    // Jika belum ada, insert baru
-    const { error: insertError } = await supabase
-      .from("checkout")
-      .insert([{
-        item: JSON.stringify(itemList),
-        total_harga: totalHarga,
-        status: "draft",
-        created_at: new Date().toISOString()
-      }]);
-
-    if (insertError) {
-      console.error("Gagal insert checkout:", insertError.message);
-    }
-  }
-}
-// Pastikan baris dengan status 'draft' tersedia sebelum update
-async function ensureDraftRow() {
-  const { data, error } = await supabase
-    .from("checkout")
-    .select("id")
-    .eq("status", "draft")
-    .maybeSingle();
-
-  if (!data && !error) {
-    const { error: insertError } = await supabase
-      .from("checkout")
-      .insert([{ status: "draft", item: [], total_harga: 0 }]);
-
-    if (insertError) {
-      console.error("Gagal membuat draft checkout:", insertError.message);
-    }
-  }
-}
-// === Cart logic (localStorage) ===
-async function tambahItem(id, harga, nama) {
-  await ensureDraftRow(); // pastikan ada baris draft
-
-  let qty = parseInt(document.getElementById("qty-" + id).innerText);
-  qty++;
-  document.getElementById("qty-" + id).innerText = qty;
-
-  const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
-
-  cart[id] = {
-    nama: nama,
-    harga: harga,
-    qty: qty
-  };
-
-  localStorage.setItem("keranjang", JSON.stringify(cart));
-
-  await updateCheckoutToSupabase();
-}
-
-async function kurangItem(id) {
-  await ensureDraftRow();
-
-  let qty = parseInt(document.getElementById("qty-" + id).innerText);
-  if (qty > 0) qty--;
-  document.getElementById("qty-" + id).innerText = qty;
-
-  const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
-
-  if (cart[id]) {
-    cart[id].qty = qty;
-    if (qty <= 0) {
-      delete cart[id];
-    }
-  }
-
-  localStorage.setItem("keranjang", JSON.stringify(cart));
-
-  await updateCheckoutToSupabase();
-}
-
-// ✅ Agar bisa dipanggil dari HTML
-window.tambahItem = tambahItem;
-window.kurangItem = kurangItem;
-
-
-function renderQtyFromCart() {
-  const cart = JSON.parse(localStorage.getItem("keranjang") || "{}");
-  for (const [id, data] of Object.entries(cart)) {
+  async function tambahItem(id, harga, nama) {
     const qtySpan = document.getElementById("qty-" + id);
-    if (qtySpan) {
-      qtySpan.textContent = data.qty;
+    const qty = parseInt(qtySpan.innerText) + 1;
+    qtySpan.innerText = qty;
+
+    const { data: existing, error } = await supabase
+      .from("checkout")
+      .select("id, item")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    let items = [];
+    if (existing) {
+      items = existing.item || [];
+    }
+
+    const index = items.findIndex(i => i.id === id);
+    if (index >= 0) {
+      items[index].qty += 1;
+    } else {
+      items.push({ id, nama, harga, qty: 1 });
+    }
+
+    const total = items.reduce((a, b) => a + b.qty * b.harga, 0);
+
+    if (existing) {
+      await supabase.from("checkout").update({ item: items, total_harga: total }).eq("id", existing.id);
+    } else {
+      await supabase.from("checkout").insert([{ user_id: userId, item: items, total_harga: total }]);
     }
   }
-}
 
-// Panggil sekali saja saat awal
-await loadMenu();
-renderQtyFromCart();
-</script>
+  async function kurangItem(id) {
+    const qtySpan = document.getElementById("qty-" + id);
+    let qty = parseInt(qtySpan.innerText);
+    if (qty <= 0) return;
+    qty--;
+    qtySpan.innerText = qty;
 
-</body>
+    const { data: existing } = await supabase
+      .from("checkout")
+      .select("id, item")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (!existing) return;
+
+    let items = existing.item || [];
+    const index = items.findIndex(i => i.id === id);
+    if (index >= 0) {
+      items[index].qty--;
+      if (items[index].qty <= 0) items.splice(index, 1);
+    }
+
+    const total = items.reduce((a, b) => a + b.qty * b.harga, 0);
+    await supabase.from("checkout").update({ item: items, total_harga: total }).eq("id", existing.id);
+  }
+
+  window.tambahItem = tambahItem;
+  window.kurangItem = kurangItem;
+
+  loadMenu();
+</script></body>
 </html>
