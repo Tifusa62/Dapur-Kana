@@ -156,20 +156,19 @@ async function loadKeranjang() {
 
   let total = 0;
   container.innerHTML = data.item.map((item, index) => {
-    total += item.qty * item.harga;
-    return `
-      <div class="keranjang-item">
-        <div>${item.nama}</div>
-        <div class="qty-control">
-          <button onclick="kurangItem(${index})">-</button>
-          <span id="qty-${index}">${item.qty}</span>
-          <button onclick="tambahItem(${index})">+</button>
-        </div>
-        <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
-      </div>`;
-  }).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
-}
-
+  total += item.qty * item.harga;
+  return `
+    <div class="keranjang-item">
+      <div>${item.nama}</div>
+      <div class="qty-control">
+        <button onclick="kurangItem(${index})">-</button>
+        <span id="qty-${index}">${item.qty}</span>
+        <button onclick="tambahItem(${index})">+</button>
+      </div>
+      <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
+    </div>`;
+}).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+  
 window.tambahItem = async function(index) {
   const items = checkoutData.item;
   items[index].qty++;
