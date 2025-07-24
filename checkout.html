@@ -48,195 +48,176 @@
       text-align: center;
     }
 
-    .form-container,
-    .keranjang-list {
+    .notif-card {
       background: white;
       border-radius: 16px;
       padding: 16px;
-      max-width: 500px;
-      margin: 16px auto;
+      margin-bottom: 12px;
+      max-width: 600px;
+      margin-inline: auto;
     }
 
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
+    .notif-card h3 {
+      margin: 0;
+      font-size: 18px;
     }
 
-    button {
-      background: #004d4d;
-      color: white;
-      padding: 10px;
-      margin-top: 16px;
-      border: none;
-      border-radius: 8px;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
+    .notif-card p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #333;
     }
 
-    .keranjang-item {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid #eee;
-      padding: 6px 0;
-    }
-
-    .total {
-      text-align: right;
+    .status {
+      padding: 6px 12px;
+      border-radius: 12px;
+      display: inline-block;
       font-weight: bold;
-      margin-top: 10px;
+      color: white;
     }
 
-    .hapus-btn {
-      background: crimson;
-      margin-top: 10px;
-    }
+    .Menunggu { background: orange; }
+    .Diterima { background: green; }
+    .Dikirim  { background: #007bff; }
+    .Selesai  { background: #444; }
+
   </style>
 </head>
 <body>
 
 <!-- Header -->
 <header>
-  <button class="hamburger" onclick="openSidebar()">☰</button>
-  <div class="title">Checkout</div>
+  <button class="hamburger" onclick="openSidebar()"></button>
+  <div class="title">Notifikasi</div>
   <div class="icons">
-    <a href="checkout.html">🛒</a>
-    <a href="notifikasi.html">🔔</a>
+    <a href="checkout.html"></a>
+    <a href="notifikasi.html"></a>
   </div>
 </header>
 
 <!-- Sidebar -->
-<div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
-  <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
-  <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
-  <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
-  <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
 </div>
-<div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
-
-<main>
-  <h2>Keranjang</h2>
-  <div class="keranjang-list" id="keranjangList">Memuat...</div>
-  <button class="hapus-btn" onclick="hapusKeranjang()">🗑 Hapus Keranjang</button>
-
-  <h2>Data Pemesan</h2>
-  <div class="form-container">
-    <input type="text" id="nama" placeholder="Nama lengkap" />
-    <input type="text" id="no_hp" placeholder="Nomor HP" />
-    <input type="text" id="alamat" placeholder="Alamat lengkap" />
-    <select id="metode">
-      <option value="">Pilih Metode Pembayaran</option>
-      <option value="COD">COD (Bayar di tempat)</option>
-      <option value="Transfer">Transfer</option>
-    </select>
-    <button onclick="submitPesanan()">📦 Kirim Pesanan</button>
+  </header>
+  <div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
+    <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
+    <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
+    <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
+    <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
   </div>
-</main>
-
+  <div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
+  <main>
+    <h2>Keranjang</h2>
+    <div class="keranjang-list" id="keranjangList">Memuat...</div>
+    <h2>Data Pemesan</h2>
+    <div class="form-container">
+      <input type="text" id="nama" placeholder="Nama lengkap" />
+      <input type="text" id="no_hp" placeholder="Nomor HP" />
+      <input type="text" id="alamat" placeholder="Alamat lengkap" />
+      <select id="metode">
+        <option value="">Pilih Metode Pembayaran</option>
+        <option value="COD">COD (Bayar di tempat)</option>
+        <option value="Transfer">Transfer</option>
+      </select>
+      <button class="submit" onclick="submitPesanan()">Kirim Pesanan</button>
+    </div>
+  </main>
 <script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-  const supabase = createClient(
-    "https://qcevidnjbsyjfdwfduiz.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
-  );
+const supabase = createClient(
+  'https://qcevidnjbsyjfdwfduiz.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'
+);
 
-  const user_id = localStorage.getItem("user_id");
+const user_id = localStorage.getItem('user_id');
 
-  async function loadKeranjang() {
-    const { data, error } = await supabase
-      .from("checkout")
-      .select("*")
-      .eq("user_id", user_id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+let checkoutData;
 
-    const container = document.getElementById("keranjangList");
-    if (error || !data || !data.item?.length) {
-      container.innerHTML = "Keranjang kosong.";
-      return;
-    }
-
-    let total = 0;
-    const html = data.item.map(item => {
-      total += item.qty * item.harga;
-      return `
-        <div class="keranjang-item">
-          <div>${item.nama} x ${item.qty}</div>
-          <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
-        </div>`;
-    }).join("");
-
-    container.innerHTML = html + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+async function loadKeranjang() {
+  const { data } = await supabase.from('checkout').select('*').eq('user_id', user_id).maybeSingle();
+  checkoutData = data;
+  const container = document.getElementById('keranjangList');
+  if (!data || !data.item || data.item.length === 0) {
+    container.innerHTML = 'Keranjang kosong.';
+    return;
   }
 
-  async function submitPesanan() {
-    const nama = document.getElementById("nama").value.trim();
-    const no_hp = document.getElementById("no_hp").value.trim();
-    const alamat = document.getElementById("alamat").value.trim();
-    const metode = document.getElementById("metode").value.trim();
+  let total = 0;
+  container.innerHTML = data.item.map(item => {
+    total += item.qty * item.harga;
+    return `
+      <div class="keranjang-item">
+        <div>${item.nama}</div>
+        <div class="qty-control">
+          <button onclick="kurangItem('${item.id}')">-</button>
+          <span id="qty-${item.id}">${item.qty}</span>
+          <button onclick="tambahItem('${item.id}')">+</button>
+        </div>
+        <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
+      </div>`;
+  }).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+}
 
-    if (!nama || !no_hp || !alamat || !metode) {
-      alert("Semua data wajib diisi.");
-      return;
-    }
+window.tambahItem = async function (id) {
+  const items = checkoutData.item;
+  const index = items.findIndex(i => i.id === id);
+  if (index >= 0) items[index].qty++;
+  updateCheckout(items);
+};
 
-    const { data: checkout, error } = await supabase
-      .from("checkout")
-      .select("*")
-      .eq("user_id", user_id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!checkout || !checkout.item?.length) {
-      alert("Keranjang masih kosong.");
-      return;
-    }
-
-    const { error: insertError } = await supabase.from("pesanan").insert([{
-      nama, no_hp, alamat, metode,
-      items: checkout.item,
-      total_harga: checkout.total_harga,
-      status: "Menunggu",
-      user_id
-    }]);
-
-    if (insertError) {
-      alert("❌ Gagal mengirim pesanan.");
-    } else {
-      await supabase.from("checkout").delete().eq("user_id", user_id);
-      alert("✅ Pesanan berhasil dikirim!");
-      window.location.href = "notifikasi.html";
-    }
+window.kurangItem = async function (id) {
+  let items = checkoutData.item;
+  const index = items.findIndex(i => i.id === id);
+  if (index >= 0) {
+    items[index].qty--;
+    if (items[index].qty <= 0) items.splice(index, 1);
   }
+  updateCheckout(items);
+};
 
-  async function hapusKeranjang() {
-    const konfirmasi = confirm("Yakin ingin menghapus keranjang?");
-    if (!konfirmasi) return;
-
-    await supabase.from("checkout").delete().eq("user_id", user_id);
-    alert("Keranjang berhasil dihapus.");
-    location.reload();
-  }
-
-  window.openSidebar = () => {
-    document.getElementById("sidebar").style.left = "0";
-    document.getElementById("overlay").style.display = "block";
-  }
-
-  window.closeSidebar = () => {
-    document.getElementById("sidebar").style.left = "-250px";
-    document.getElementById("overlay").style.display = "none";
-  }
-
+async function updateCheckout(items) {
+  const total = items.reduce((sum, i) => sum + i.qty * i.harga, 0);
+  await supabase.from('checkout').update({ item: items, total_harga: total }).eq('id', checkoutData.id);
+  checkoutData.item = items;
+  checkoutData.total_harga = total;
   loadKeranjang();
-</script>
+}
 
+window.submitPesanan = async function () {
+  const nama = document.getElementById('nama').value;
+  const no_hp = document.getElementById('no_hp').value;
+  const alamat = document.getElementById('alamat').value;
+  const metode = document.getElementById('metode').value;
+  if (!nama || !no_hp || !alamat || !metode) return alert('Lengkapi semua field!');
+  if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) return alert('Keranjang kosong!');
+
+  const { error } = await supabase.from('pesanan').insert({
+    nama,
+    no_hp,
+    alamat,
+    metode,
+    items: checkoutData.item,
+    total_harga: checkoutData.total_harga,
+    status: 'Menunggu',
+    user_id
+  });
+
+  if (error) return alert('Gagal kirim pesanan.');
+  await supabase.from('checkout').delete().eq('id', checkoutData.id);
+  alert('Pesanan berhasil dikirim!');
+  window.location.reload();
+};
+
+window.openSidebar = () => {
+  document.getElementById("sidebar").style.left = "0";
+  document.getElementById("overlay").style.display = "block";
+};
+window.closeSidebar = () => {
+  document.getElementById("sidebar").style.left = "-250px";
+  document.getElementById("overlay").style.display = "none";
+};
+
+loadKeranjang();
+</script>
 </body>
 </html>
