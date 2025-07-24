@@ -44,62 +44,58 @@
     }
 
     h2 {
+      color: white;
       text-align: center;
-      color: white;
     }
 
-    table {
-      width: 100%;
+    .form-container {
       background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    th {
-      background: #004d4d;
-      color: white;
-    }
-
-    .total {
-      text-align: right;
-      font-weight: bold;
-      margin-top: 10px;
-      font-size: 18px;
-      color: white;
-    }
-
-    form {
-      background: white;
+      border-radius: 16px;
       padding: 16px;
-      border-radius: 12px;
+      max-width: 500px;
+      margin: 16px auto;
     }
 
-    input, textarea, select {
+    input, select {
       width: 100%;
       padding: 10px;
-      margin: 8px 0;
+      margin-top: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 16px;
     }
 
     button {
-      width: 100%;
-      padding: 12px;
       background: #004d4d;
       color: white;
+      padding: 10px;
+      margin-top: 16px;
       border: none;
       border-radius: 8px;
-      font-size: 18px;
-      margin-top: 10px;
+      width: 100%;
+      font-size: 16px;
       cursor: pointer;
+    }
+
+    .keranjang-list {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      max-width: 500px;
+      margin: 16px auto;
+    }
+
+    .keranjang-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding: 6px 0;
+    }
+
+    .total {
+      text-align: right;
+      font-weight: bold;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -110,6 +106,7 @@
   <button class="hamburger" onclick="openSidebar()">☰</button>
   <div class="title">Checkout</div>
   <div class="icons">
+    <a href="checkout.html">🛒</a>
     <a href="notifikasi.html">🔔</a>
   </div>
 </header>
@@ -126,77 +123,112 @@
 <div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
 
 <main>
-  <h2>Keranjang Anda</h2>
-  <div id="keranjangSection">
-    <table id="keranjangTable">
-      <thead>
-        <tr>
-          <th>Menu</th>
-          <th>Qty</th>
-          <th>Harga</th>
-          <th>Subtotal</th>
-        </tr>
-      </thead>
-      <tbody id="keranjangBody">
-        <!-- Diisi via JS -->
-      </tbody>
-    </table>
-    <div class="total" id="totalHarga">Total: Rp 0</div>
-  </div>
+  <h2>Keranjang</h2>
+  <div class="keranjang-list" id="keranjangList">Memuat...</div>
 
   <h2>Data Pemesan</h2>
-  <form id="checkoutForm">
-    <input type="text" id="nama" placeholder="Nama Lengkap" required />
-    <input type="tel" id="no_hp" placeholder="No. HP" required />
-    <textarea id="alamat" placeholder="Alamat Lengkap" rows="3" required></textarea>
-    <select id="pembayaran" required>
+  <div class="form-container">
+    <input type="text" id="nama" placeholder="Nama lengkap" />
+    <input type="text" id="no_hp" placeholder="Nomor HP" />
+    <input type="text" id="alamat" placeholder="Alamat lengkap" />
+    <select id="metode">
       <option value="">Pilih Metode Pembayaran</option>
-      <option value="COD">Bayar di Tempat</option>
-      <option value="Transfer">Transfer Bank</option>
+      <option value="COD">COD (Bayar di tempat)</option>
+      <option value="Transfer">Transfer</option>
     </select>
-    <button type="submit">Kirim Pesanan</button>
-  </form>
+    <button onclick="submitPesanan()">Kirim Pesanan</button>
+  </div>
 </main>
 
-<script>
-  function openSidebar() {
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+  const supabase = createClient(
+    "https://qcevidnjbsyjfdwfduiz.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI" // ganti dengan anon key asli kamu
+  );
+
+  const user_id = localStorage.getItem("user_id");
+
+  async function loadKeranjang() {
+    const { data, error } = await supabase
+      .from("checkout")
+      .select("*")
+      .eq("user_id", user_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const container = document.getElementById("keranjangList");
+    if (error || !data) {
+      container.innerHTML = "Keranjang kosong.";
+      return;
+    }
+
+    const items = data.item || [];
+    let total = 0;
+    container.innerHTML = items.map(item => {
+      total += item.qty * item.harga;
+      return `
+        <div class="keranjang-item">
+          <div>${item.nama} x ${item.qty}</div>
+          <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
+        </div>
+      `;
+    }).join("") + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+  }
+
+  async function submitPesanan() {
+    const nama = document.getElementById("nama").value;
+    const no_hp = document.getElementById("no_hp").value;
+    const alamat = document.getElementById("alamat").value;
+    const metode = document.getElementById("metode").value;
+
+    const { data: checkoutData } = await supabase
+      .from("checkout")
+      .select("*")
+      .eq("user_id", user_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) {
+      alert("Keranjang kosong.");
+      return;
+    }
+
+    const { error } = await supabase.from("pesanan").insert([{
+      nama,
+      no_hp,
+      alamat,
+      metode,
+      items: checkoutData.item,
+      total: checkoutData.total_harga,
+      status: "Menunggu",
+      user_id
+    }]);
+
+    if (error) {
+      alert("Gagal kirim pesanan.");
+    } else {
+      alert("Pesanan berhasil dikirim!");
+      // opsional: hapus dari checkout setelah kirim
+      await supabase.from("checkout").delete().eq("user_id", user_id);
+      location.reload();
+    }
+  }
+
+  // Sidebar
+  window.openSidebar = () => {
     document.getElementById("sidebar").style.left = "0";
     document.getElementById("overlay").style.display = "block";
   }
-
-  function closeSidebar() {
+  window.closeSidebar = () => {
     document.getElementById("sidebar").style.left = "-250px";
     document.getElementById("overlay").style.display = "none";
   }
 
-  function tampilkanKeranjang() {
-    const keranjang = JSON.parse(localStorage.getItem("keranjang") || "{}");
-    const tbody = document.getElementById("keranjangBody");
-    const totalEl = document.getElementById("totalHarga");
-
-    tbody.innerHTML = "";
-    let total = 0;
-
-    for (const id in keranjang) {
-      const item = keranjang[id];
-      const subtotal = item.qty * item.harga;
-      total += subtotal;
-
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${item.nama}</td>
-        <td>${item.qty}</td>
-        <td>Rp ${item.harga.toLocaleString()}</td>
-        <td>Rp ${subtotal.toLocaleString()}</td>
-      `;
-      tbody.appendChild(row);
-    }
-
-    totalEl.textContent = "Total: Rp " + total.toLocaleString();
-  }
-
-  // Panggil saat halaman dibuka
-  tampilkanKeranjang();
+  loadKeranjang();
 </script>
 
 </body>
