@@ -104,6 +104,7 @@
       <a href="notifikasi.html">🔔</a>
     </div>
   </header>
+  <div id="infoPembayaran" style="margin-top: 16px;"></div>
   <div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
     <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
     <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
@@ -121,8 +122,8 @@
       <input type="text" id="alamat" placeholder="Alamat lengkap" />
       <select id="metode">
         <option value="">Pilih Metode Pembayaran</option>
-        <option value="COD">COD (Bayar di tempat)</option>
-        <option value="Transfer">Transfer</option>
+        <option value="BCA">Bank Centra Asia</option>
+        <option value="Link Aja">Link Aja</option>
       </select>
       <button class="submit" onclick="submitPesanan()">Kirim Pesanan</button>
     </div>
@@ -208,6 +209,35 @@ window.submitPesanan = async function () {
     user_id
   });
 
+const infoPembayaranDiv = document.getElementById("infoPembayaran");
+
+document.getElementById("metode").addEventListener("change", async (e) => {
+  const metode = e.target.value;
+
+  const { data, error } = await supabase
+    .from("pembayaran")
+    .select("*")
+    .eq("metode", metode)
+    .maybeSingle();
+
+  if (error || !data) {
+    infoPembayaranDiv.innerHTML = "";
+    return;
+  }
+
+  if (metode.toLowerCase() === "qris") {
+    infoPembayaranDiv.innerHTML = `
+      <p>Silakan scan QRIS berikut:</p>
+      <img src="${data.qris_url}" style="max-width: 100%; border-radius: 12px;" />
+    `;
+  } else {
+    infoPembayaranDiv.innerHTML = `
+      <p><strong>Bank:</strong> ${data.nama_bank}</p>
+      <p><strong>Nomor Rekening:</strong> ${data.no_rek}</p>
+      <p><strong>Atas Nama:</strong> ${data.atas_nama}</p>
+    `;
+  }
+});
   if (error) return alert('Gagal kirim pesanan.');
   await supabase.from('checkout').delete().eq('id', checkoutData.id);
   alert('Pesanan berhasil dikirim!');
