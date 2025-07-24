@@ -20,13 +20,13 @@
       align-items: center;
     }
 
-.hamburger {
-  font-size: 24px;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
+    .hamburger {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
 
     .title {
       font-size: 20px;
@@ -48,7 +48,8 @@
       text-align: center;
     }
 
-    .form-container {
+    .form-container,
+    .keranjang-list {
       background: white;
       border-radius: 16px;
       padding: 16px;
@@ -75,14 +76,6 @@
       width: 100%;
       font-size: 16px;
       cursor: pointer;
-    }
-
-    .keranjang-list {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
-      max-width: 500px;
-      margin: 16px auto;
     }
 
     .keranjang-item {
@@ -118,8 +111,6 @@
   <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
   <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
 </div>
-
-<!-- Overlay -->
 <div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
 
 <main>
@@ -145,7 +136,7 @@
 
   const supabase = createClient(
     "https://qcevidnjbsyjfdwfduiz.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI" // ganti dengan anon key asli kamu
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
   );
 
   const user_id = localStorage.getItem("user_id");
@@ -160,73 +151,70 @@
       .maybeSingle();
 
     const container = document.getElementById("keranjangList");
-    if (error || !data) {
+    if (error || !data || !data.item?.length) {
       container.innerHTML = "Keranjang kosong.";
       return;
     }
 
-    const items = data.item || [];
     let total = 0;
-    container.innerHTML = items.map(item => {
+    const html = data.item.map(item => {
       total += item.qty * item.harga;
       return `
         <div class="keranjang-item">
           <div>${item.nama} x ${item.qty}</div>
           <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
-        </div>
-      `;
-    }).join("") + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+        </div>`;
+    }).join("");
+
+    container.innerHTML = html + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
   }
 
-async function submitPesanan() {
-  const nama = document.getElementById("nama").value.trim();
-  const no_hp = document.getElementById("no_hp").value.trim();
-  const alamat = document.getElementById("alamat").value.trim();
-  const metode = document.getElementById("metode").value;
+  async function submitPesanan() {
+    const nama = document.getElementById("nama").value.trim();
+    const no_hp = document.getElementById("no_hp").value.trim();
+    const alamat = document.getElementById("alamat").value.trim();
+    const metode = document.getElementById("metode").value.trim();
 
-  if (!nama || !no_hp || !alamat || !metode) {
-    alert("Mohon lengkapi semua data pemesanan.");
-    return;
+    if (!nama || !no_hp || !alamat || !metode) {
+      alert("Semua data wajib diisi.");
+      return;
+    }
+
+    const { data: checkout } = await supabase
+      .from("checkout")
+      .select("*")
+      .eq("user_id", user_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!checkout || !checkout.item?.length) {
+      alert("Keranjang masih kosong.");
+      return;
+    }
+
+    const { error } = await supabase.from("pesanan").insert([{
+      nama, no_hp, alamat, metode,
+      items: checkout.item,
+      total_harga: checkout.total_harga,
+      status: "Menunggu",
+      user_id
+    }]);
+
+    if (error) {
+      alert("Gagal mengirim pesanan.");
+    } else {
+      await supabase.from("checkout").delete().eq("user_id", user_id);
+      alert("Pesanan berhasil dikirim!");
+      window.location.href = "notifikasi.html";
+    }
   }
 
-  const { data: checkoutData, error: cekError } = await supabase
-    .from("checkout")
-    .select("*")
-    .eq("user_id", user_id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (cekError || !checkoutData || !checkoutData.item || checkoutData.item.length === 0) {
-    alert("Keranjang kosong atau gagal memuat.");
-    return;
-  }
-
-  const { error } = await supabase.from("pesanan").insert([{
-    user_id,
-    nama,
-    no_hp,
-    alamat,
-    metode,
-    items: checkoutData.item,
-    total_harga: checkoutData.total_harga, // Sesuaikan dengan nama kolom
-    status: "Menunggu"
-  }]);
-
-  if (error) {
-    alert("Gagal kirim pesanan: " + error.message);
-  } else {
-    alert("Pesanan berhasil dikirim!");
-    await supabase.from("checkout").delete().eq("user_id", user_id);
-    window.location.href = "notifikasi.html";
-  }
-}
-
-  // Sidebar
   window.openSidebar = () => {
     document.getElementById("sidebar").style.left = "0";
     document.getElementById("overlay").style.display = "block";
   }
+
   window.closeSidebar = () => {
     document.getElementById("sidebar").style.left = "-250px";
     document.getElementById("overlay").style.display = "none";
@@ -234,6 +222,5 @@ async function submitPesanan() {
 
   loadKeranjang();
 </script>
-
 </body>
 </html>
