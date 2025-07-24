@@ -197,7 +197,13 @@ window.submitPesanan = async function () {
   const metode = document.getElementById('metode').value;
   if (!nama || !no_hp || !alamat || !metode) return alert('Lengkapi semua field!');
   if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) return alert('Keranjang kosong!');
-
+  if (metode.toLowerCase() !== 'cod') {
+    const konfirmasi = confirm('Pastikan Anda sudah melakukan pembayaran sebelum melanjutkan.\nKlik OK jika sudah membayar.');
+    if (!konfirmasi) {
+      alert('Silakan lakukan pembayaran terlebih dahulu.');
+      return;
+    }
+  }
   const { error } = await supabase.from('pesanan').insert({
     nama,
     no_hp,
@@ -246,7 +252,7 @@ document.getElementById("metode").addEventListener("change", async (e) => {
   } else {
     infoPembayaranDiv.innerHTML = `
       <p><strong>Bank:</strong> ${data.nama_bank}</p>
-      <p><strong>Nomor Rekening:</strong> ${data.no_rek}</p>
+      <p><strong>Nomor Rekening:</strong> ${data.rekening}</p>
       <p><strong>Atas Nama:</strong> ${data.atas_nama}</p>
     `;
   }
