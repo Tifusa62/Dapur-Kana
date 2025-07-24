@@ -1,0 +1,284 @@
+/* ========== WARNA DASAR DAN TEMA ========== */
+:root {
+  --toska: #00cfd3;
+  --toska-gelap: #004d4d;
+  --putih: #ffffff;
+  --abu: #f5f5f5;
+  --abu-tua: #ddd;
+  --teks-hitam: #333;
+}
+
+/* ========== RESET & UMUM ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--toska);
+  color: var(--teks-hitam);
+}
+
+/* ========== HEADER ========== */
+header {
+  background: var(--toska-gelap);
+  color: white;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hamburger {
+  font-size: 28px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.icons a {
+  color: white;
+  text-decoration: none;
+  margin-left: 12px;
+}
+
+/* ========== SIDEBAR ========== */
+#sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  background: #003333;
+  z-index: 1000;
+  padding-top: 60px;
+  transition: 0.3s;
+}
+
+#sidebar a {
+  color: white;
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+
+#overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+/* ========== UTAMA / MAIN ========== */
+main {
+  padding: 16px;
+}
+
+/* ========== JUDUL ========== */
+h2 {
+  text-align: center;
+  color: white;
+  margin-bottom: 16px;
+}
+
+/* ========== TOMBOL ========== */
+button {
+  background: var(--toska-gelap);
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:disabled {
+  background: grey;
+  cursor: not-allowed;
+}
+
+/* ========== FORM ========== */
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  display: block;
+}
+
+/* ========== KARTU MENU ========== */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.menu-card {
+  background: white;
+  border-radius: 16px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.menu-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.menu-card h3 {
+  margin: 10px 0 4px;
+  font-size: 16px;
+}
+
+.menu-card p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* ========== MODAL ========== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 16px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  text-align: center;
+}
+
+.modal-content img {
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+.close-btn {
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: var(--toska-gelap);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ========== KERANJANG ========== */
+.keranjang-list {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  max-width: 500px;
+  margin: 16px auto;
+}
+
+.keranjang-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  padding: 6px 0;
+}
+
+.total {
+  text-align: right;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* ========== FORM CONTAINER ========== */
+.form-container {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  max-width: 500px;
+  margin: 16px auto;
+}
+
+/* ========== BANNER ITEM ========== */
+.banner-item {
+  position: relative;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.banner-item img {
+  width: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.banner-caption {
+  position: absolute;
+  bottom: 10px;
+  left: 16px;
+  color: white;
+  background: rgba(0,0,0,0.4);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* ========== AKSI TAMBAH - KURANG ========== */
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+  gap: 10px;
+}
+
+.actions button {
+  background: var(--toska-gelap);
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+/* ========== LAPORAN & CHART (owner.html) ========== */
+.dashboard-section {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 16px auto;
+  max-width: 90%;
+}
+
+canvas {
+  max-width: 100%;
+}
+
+/* ========== FOOTER (opsional) ========== */
+footer {
+  text-align: center;
+  padding: 16px;
+  background: #003333;
+  color: white;
+}
