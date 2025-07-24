@@ -1,263 +1,535 @@
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Checkout - Dapur Kana</title>
+
   <style>
+
     body {
+
       margin: 0;
+
       font-family: 'Segoe UI', sans-serif;
+
       background: #00cfd3;
+
     }
+
     header {
+
   background: #004d4d;
+
   color: white;
+
   padding: 12px 16px;
+
   display: grid;
+
   grid-template-columns: auto 1fr auto;
+
   align-items: center;
+
 }
+
+
 
 .hamburger {
+
   font-size: 24px;
+
   background: none;
+
   border: none;
+
   color: white;
+
   cursor: pointer;
+
 }
+
+
 
 .title {
+
   text-align: center;
+
   font-size: 20px;
+
   font-weight: bold;
+
 }
+
+
 
 .icons {
+
   display: flex;
+
   align-items: center;
+
   gap: 12px;
+
   justify-content: flex-end;
+
 }
+
+
 
 .icons a {
+
   color: white;
+
   text-decoration: none;
+
 }
+
     main {
+
       padding: 16px;
+
     }
+
     h2 {
+
       color: white;
+
       text-align: center;
+
     }
+
     .keranjang-list, .form-container {
+
       background: white;
+
       border-radius: 16px;
+
       padding: 16px;
+
       max-width: 500px;
+
       margin: 16px auto;
+
     }
+
     .keranjang-item {
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
+
       padding: 8px 0;
+
       border-bottom: 1px solid #eee;
+
     }
+
     .qty-control {
+
       display: flex;
+
       align-items: center;
+
       gap: 8px;
+
     }
+
     .qty-control button {
+
       background: #004d4d;
+
       color: white;
+
       border: none;
+
       padding: 4px 10px;
+
       border-radius: 8px;
+
       font-size: 16px;
+
       cursor: pointer;
+
     }
+
     .total {
+
       text-align: right;
+
       font-weight: bold;
+
       margin-top: 10px;
+
     }
+
     input, select, button {
+
       width: 100%;
+
       padding: 10px;
+
       margin-top: 10px;
+
       border-radius: 8px;
+
       border: 1px solid #ccc;
+
       font-size: 16px;
+
     }
+
     button.submit {
+
       background: #004d4d;
+
       color: white;
+
       border: none;
+
       margin-top: 16px;
+
     }
+
   </style>
+
 </head>
+
 <body>
+
   <header>
+
   <button class="hamburger" onclick="openSidebar()">☰</button>
+
   <div class="title">Checkout</div>
+
   <div class="icons">
+
     <a href="checkout.html">🛒</a>
+
     <a href="notifikasi.html">🔔</a>
+
   </div>
+
 </header>
+
   <div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
+
     <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
+
     <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
+
     <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
+
     <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
+
   </div>
+
   <div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
+
   <main>
+
     <h2>Keranjang</h2>
+
     <div class="keranjang-list" id="keranjangList">Memuat...</div>
+
     <h2>Data Pemesan</h2>
+
     <div class="form-container">
+
       <input type="text" id="nama" placeholder="Nama lengkap" />
+
       <input type="text" id="no_hp" placeholder="Nomor HP" />
+
       <input type="text" id="alamat" placeholder="Alamat lengkap" />
+
       <select id="metode">
+
         <option value="">Pilih Metode Pembayaran</option>
+
         <option value="BCA">Bank Centra Asia</option>
+
         <option value="Link Aja">Link Aja</option>
+
       </select>
+
       <div id="infoPembayaran" style="margin-top: 16px;"></div>
+
       <button class="submit" onclick="submitPesanan()">Kirim Pesanan</button>
+
     </div>
+
   </main>
+
 <script type="module">
+
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
+
+
 const supabase = createClient(
+
   'https://qcevidnjbsyjfdwfduiz.supabase.co',
+
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'
+
 );
+
+
 
 const user_id = localStorage.getItem('user_id');
 
+
+
 let checkoutData;
 
+
+
 async function loadKeranjang() {
+
   const { data } = await supabase.from('checkout').select('*').eq('user_id', user_id).maybeSingle();
+
   checkoutData = data;
+
   const container = document.getElementById('keranjangList');
+
   if (!data || !data.item || data.item.length === 0) {
+
     container.innerHTML = 'Keranjang kosong.';
+
     return;
+
   }
+
+
 
   let total = 0;
-  container.innerHTML = data.item.map((item, index) => {
-  total += item.qty * item.harga;
-  return `
-    <div class="keranjang-item">
-      <div>${item.nama}</div>
-      <div class="qty-control">
-        <button onclick="kurangItem(${index})">-</button>
-        <span id="qty-${index}">${item.qty}</span>
-        <button onclick="tambahItem(${index})">+</button>
-      </div>
-      <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
-    </div>`;
-}).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
 
-window.tambahItem = async function (index) {
-  const items = checkoutData.item;
-  items[index].qty++;
-  updateCheckout(items);
-};
+  container.innerHTML = data.item.map(item => {
 
-window.kurangItem = async function (index) {
-  const items = checkoutData.item;
-  items[index].qty--;
-  if (items[index].qty <= 0) items.splice(index, 1);
-  updateCheckout(items);
-};
+    total += item.qty * item.harga;
 
-async function updateCheckout(items) {
-  const total = items.reduce((sum, i) => sum + i.qty * i.harga, 0);
-  await supabase.from('checkout').update({ item: items, total_harga: total }).eq('id', checkoutData.id);
-  checkoutData.item = items;
-  checkoutData.total_harga = total;
-  loadKeranjang();
+    return `
+
+      <div class="keranjang-item">
+
+        <div>${item.nama}</div>
+
+        <div class="qty-control">
+
+          <button onclick="kurangItem('${item.id}')">-</button>
+
+          <span id="qty-${item.id}">${item.qty}</span>
+
+          <button onclick="tambahItem('${item.id}')">+</button>
+
+        </div>
+
+        <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
+
+      </div>`;
+
+  }).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+
 }
 
-window.submitPesanan = async function () {
-  const nama = document.getElementById('nama').value;
-  const no_hp = document.getElementById('no_hp').value;
-  const alamat = document.getElementById('alamat').value;
-  const metode = document.getElementById('metode').value;
-  if (!nama || !no_hp || !alamat || !metode) return alert('Lengkapi semua field!');
-  if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) return alert('Keranjang kosong!');
-  if (metode.toLowerCase() !== 'cod') {
-    const konfirmasi = confirm('Pastikan Anda sudah melakukan pembayaran sebelum melanjutkan.\nKlik OK jika sudah membayar.');
-    if (!konfirmasi) {
-      alert('Silakan lakukan pembayaran terlebih dahulu.');
-      return;
-    }
-  }
-  const { error } = await supabase.from('pesanan').insert({
-    nama,
-    no_hp,
-    alamat,
-    metode,
-    items: checkoutData.item,
-    total_harga: checkoutData.total_harga,
-    status: 'Menunggu',
-    user_id
-  });
-  if (error) return alert('Gagal kirim pesanan.');
-  await supabase.from('checkout').delete().eq('id', checkoutData.id);
-  alert('Pesanan berhasil dikirim!');
-  window.location.reload();
+
+
+window.tambahItem = async function (id) {
+
+  const items = checkoutData.item;
+
+  const index = items.findIndex(i => i.id === id);
+
+  if (index >= 0) items[index].qty++;
+
+  updateCheckout(items);
+
 };
+
+
+
+window.kurangItem = async function (id) {
+
+  let items = checkoutData.item;
+
+  const index = items.findIndex(i => i.id === id);
+
+  if (index >= 0) {
+
+    items[index].qty--;
+
+    if (items[index].qty <= 0) items.splice(index, 1);
+
+  }
+
+  updateCheckout(items);
+
+};
+
+
+
+async function updateCheckout(items) {
+
+  const total = items.reduce((sum, i) => sum + i.qty * i.harga, 0);
+
+  await supabase.from('checkout').update({ item: items, total_harga: total }).eq('id', checkoutData.id);
+
+  checkoutData.item = items;
+
+  checkoutData.total_harga = total;
+
+  loadKeranjang();
+
+}
+
+
+
+window.submitPesanan = async function () {
+
+  const nama = document.getElementById('nama').value;
+
+  const no_hp = document.getElementById('no_hp').value;
+
+  const alamat = document.getElementById('alamat').value;
+
+  const metode = document.getElementById('metode').value;
+
+  if (!nama || !no_hp || !alamat || !metode) return alert('Lengkapi semua field!');
+
+  if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) return alert('Keranjang kosong!');
+
+  if (metode.toLowerCase() !== 'cod') {
+
+    const konfirmasi = confirm('Pastikan Anda sudah melakukan pembayaran sebelum melanjutkan.\nKlik OK jika sudah membayar.');
+
+    if (!konfirmasi) {
+
+      alert('Silakan lakukan pembayaran terlebih dahulu.');
+
+      return;
+
+    }
+
+  }
+
+  const { error } = await supabase.from('pesanan').insert({
+
+    nama,
+
+    no_hp,
+
+    alamat,
+
+    metode,
+
+    items: checkoutData.item,
+
+    total_harga: checkoutData.total_harga,
+
+    status: 'Menunggu',
+
+    user_id
+
+  });
+
+  if (error) return alert('Gagal kirim pesanan.');
+
+  await supabase.from('checkout').delete().eq('id', checkoutData.id);
+
+  alert('Pesanan berhasil dikirim!');
+
+  window.location.reload();
+
+};
+
+
 
 window.openSidebar = () => {
+
   document.getElementById("sidebar").style.left = "0";
+
   document.getElementById("overlay").style.display = "block";
+
 };
+
 window.closeSidebar = () => {
+
   document.getElementById("sidebar").style.left = "-250px";
+
   document.getElementById("overlay").style.display = "none";
+
 };
+
 const infoPembayaranDiv = document.getElementById("infoPembayaran");
 
+
+
 document.getElementById("metode").addEventListener("change", async (e) => {
+
   const metode = e.target.value;
 
+
+
   const { data, error } = await supabase
+
     .from("pembayaran")
+
     .select("*")
+
     .eq("metode", metode)
+
     .maybeSingle();
 
+
+
   if (error || !data) {
+
     infoPembayaranDiv.innerHTML = "";
+
     return;
+
   }
 
+
+
   if (metode.toLowerCase() === "qris") {
+
     infoPembayaranDiv.innerHTML = `
+
       <p>Silakan scan QRIS berikut:</p>
+
       <img src="${data.qris_url}" style="max-width: 100%; border-radius: 12px;" />
+
     `;
+
   } else {
+
     infoPembayaranDiv.innerHTML = `
+
       <p><strong>Bank:</strong> ${data.nama_bank}</p>
+
       <p><strong>Nomor Rekening:</strong> ${data.rekening}</p>
+
       <p><strong>Atas Nama:</strong> ${data.atas_nama}</p>
+
     `;
+
   }
+
 });
+
 loadKeranjang();
+
 </script>
+
 </body>
+
 </html>
