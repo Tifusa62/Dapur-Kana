@@ -137,7 +137,7 @@
 
     container.innerHTML = "";
     data.forEach(pesanan => {
-      const total = pesanan.total || 0;
+      const total = pesanan.total_harga || 0;
       const items = pesanan.items || [];
 
       const itemList = items.map(item => `${item.nama} x ${item.qty}`).join(", ");
