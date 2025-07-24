@@ -4,79 +4,171 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Notifikasi - Dapur Kana</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #00cfd3;
+    }
+
+    header {
+      background: #004d4d;
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hamburger {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .icons a {
+      color: white;
+      text-decoration: none;
+      margin-left: 12px;
+    }
+
+    main {
+      padding: 16px;
+    }
+
+    h2 {
+      color: white;
+      text-align: center;
+    }
+
+    .notif-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      max-width: 600px;
+      margin-inline: auto;
+    }
+
+    .notif-card h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .notif-card p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .status {
+      padding: 6px 12px;
+      border-radius: 12px;
+      display: inline-block;
+      font-weight: bold;
+      color: white;
+    }
+
+    .Menunggu { background: orange; }
+    .Diterima { background: green; }
+    .Dikirim  { background: #007bff; }
+    .Selesai  { background: #444; }
+
+  </style>
 </head>
 <body>
 
-  <header>
-    <h1>📢 Notifikasi Pesanan</h1>
-    <nav>
-      <a href="index.html">Beranda</a>
-      <a href="menu.html">Menu</a>
-      <a href="checkout.html">Keranjang</a>
-    </nav>
-  </header>
+<!-- Header -->
+<header>
+  <button class="hamburger" onclick="openSidebar()">☰</button>
+  <div class="title">Notifikasi</div>
+  <div class="icons">
+    <a href="checkout.html">🛒</a>
+    <a href="notifikasi.html">🔔</a>
+  </div>
+</header>
 
-  <main style="padding: 1rem;">
-    <div id="notifList">
-      <p>Memuat notifikasi...</p>
-    </div>
-  </main>
+<!-- Sidebar -->
+<div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
+  <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
+  <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
+  <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
+  <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
+</div>
 
-  <footer>
-    <p>© 2025 Dapur Kana</p>
-  </footer>
+<!-- Overlay -->
+<div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div>
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+<main>
+  <h2>Status Pesanan</h2>
+  <div id="notifContainer">Memuat...</div>
+</main>
 
-    const supabaseUrl = 'https://qcevidnjbsyjfdwfduiz.supabase.co'
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'; // gunakan key kamu
-    const supabase = createClient(supabaseUrl, supabaseKey)
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    const notifList = document.getElementById("notifList");
+  const supabase = createClient(
+    "https://qcevidnjbsyjfdwfduiz.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI" // ganti dengan anon key asli kamu
+  );
 
-    async function loadNotifikasi() {
-      const { data, error } = await supabase
-        .from('pesanan')
-        .select('*')
-        .order('waktu', { ascending: false });
+  const user_id = localStorage.getItem("user_id");
 
-      if (error) {
-        notifList.innerHTML = `<p style="color:red;">Gagal memuat notifikasi: ${error.message}</p>`;
-        return;
-      }
+  async function loadNotifikasi() {
+    const { data, error } = await supabase
+      .from("pesanan")
+      .select("*")
+      .eq("user_id", user_id)
+      .order("waktu", { ascending: false });
 
-      if (data.length === 0) {
-        notifList.innerHTML = "<p>Belum ada pesanan masuk.</p>";
-        return;
-      }
+    const container = document.getElementById("notifContainer");
 
-      notifList.innerHTML = "";
-      data.forEach(pesan => {
-        const div = document.createElement("div");
-        div.className = "menu-card"; // gunakan styling kartu dari CSS yang sama
-        const tanggal = new Date(pesan.waktu).toLocaleString();
-
-        const itemsList = pesan.items.map(item => `
-          <li>${item.nama} x${item.qty} - Rp ${item.harga * item.qty}</li>
-        `).join("");
-
-        div.innerHTML = `
-          <h3>👤 ${pesan.nama}</h3>
-          <p>📞 ${pesan.no_hp}</p>
-          <p>📍 ${pesan.alamat}</p>
-          <p>🕒 ${tanggal}</p>
-          <ul>${itemsList}</ul>
-          <p>💳 Pembayaran: <strong>${pesan.metode}</strong></p>
-          <p>Total: <strong>Rp ${pesan.total.toLocaleString()}</strong></p>
-          <p>Status: <em>${pesan.status || 'Menunggu'}</em></p>
-        `;
-        notifList.appendChild(div);
-      });
+    if (error || !data || data.length === 0) {
+      container.innerHTML = "<p style='color:white;text-align:center;'>Belum ada pesanan.</p>";
+      return;
     }
 
-    loadNotifikasi();
-  </script>
+    container.innerHTML = "";
+    data.forEach(pesanan => {
+      const total = pesanan.total || 0;
+      const items = pesanan.items || [];
+
+      const itemList = items.map(item => `${item.nama} x ${item.qty}`).join(", ");
+
+      const card = document.createElement("div");
+      card.className = "notif-card";
+      card.innerHTML = `
+        <h3>Pesanan #${pesanan.id.slice(0, 6)}</h3>
+        <p><strong>Nama:</strong> ${pesanan.nama}</p>
+        <p><strong>Alamat:</strong> ${pesanan.alamat}</p>
+        <p><strong>Metode:</strong> ${pesanan.metode}</p>
+        <p><strong>Items:</strong> ${itemList}</p>
+        <p><strong>Total:</strong> Rp ${total.toLocaleString()}</p>
+        <p class="status ${pesanan.status}">${pesanan.status}</p>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // Sidebar
+  window.openSidebar = () => {
+    document.getElementById("sidebar").style.left = "0";
+    document.getElementById("overlay").style.display = "block";
+  }
+  window.closeSidebar = () => {
+    document.getElementById("sidebar").style.left = "-250px";
+    document.getElementById("overlay").style.display = "none";
+  }
+
+  loadNotifikasi();
+</script>
+
 </body>
 </html>
