@@ -14,16 +14,12 @@
   background: #004d4d;
   color: white;
   padding: 12px 16px;
-  height: 56px;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: center;
-  position: relative;
 }
 
 .hamburger {
-  position: absolute;
-  left: 16px;
   font-size: 24px;
   background: none;
   border: none;
@@ -32,16 +28,16 @@
 }
 
 .title {
+  text-align: center;
   font-size: 20px;
   font-weight: bold;
 }
 
 .icons {
-  position: absolute;
-  right: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
+  justify-content: flex-end;
 }
 
 .icons a {
