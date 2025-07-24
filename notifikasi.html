@@ -150,7 +150,7 @@
         <p><strong>Alamat:</strong> ${pesanan.alamat}</p>
         <p><strong>Metode:</strong> ${pesanan.metode}</p>
         <p><strong>Items:</strong> ${itemList}</p>
-        <p><strong>Total:</strong> Rp ${total.toLocaleString()}</p>
+        <p><strong>Total:</strong> Rp ${data.total_harga.toLocaleString()}</p>
         <p class="status ${pesanan.status}">${pesanan.status}</p>
       `;
       container.appendChild(card);
