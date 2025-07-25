@@ -331,14 +331,29 @@ document.getElementById("formBanner").addEventListener("submit", async (e) => {
     .from("banners")
     .insert([{ url, judul, subjudul }]);
 
-  if (dbError) {
-    alert("Gagal simpan ke database: " + dbError.message);
-  } else {
-    alert("Banner berhasil diupload!");
-    document.getElementById("formBanner").reset();
-    loadBannerList();
-  }
-});
+if (dbError) {
+  alert("Gagal simpan ke database: " + dbError.message);
+} else {
+  alert("Banner berhasil diupload!");
+
+  // === Kirim notifikasi ke Telegram Bot
+  const gasUrl = "https://script.google.com/macros/s/AKfycbxGu107wJl_u4VrI3a8zLZnsBgDOErEEbeVrhqYt4iRN7jl8lFV6M2aaVkolITjaGNJNQ/exec"; // ganti dengan URL Web App kamu
+
+  fetch(gasUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      action: "kirim_banner",
+      url,
+      judul,
+      subjudul
+    })
+  });
+  document.getElementById("formBanner").reset();
+  loadBannerList();
+}
 
 async function loadBannerList() {
   bannerList.innerHTML = "Memuat...";
