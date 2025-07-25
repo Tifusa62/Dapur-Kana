@@ -407,25 +407,33 @@ window.submitPesanan = async function () {
 
   if (file) {
   const filename = `${user_id}/${Date.now()}_${file.name}`;
-  const { error: uploadError } = await supabase.storage
-    .from('bukti-pembayaran')
-    .upload(filename, file, {
-      cacheControl: '3600',
-      upsert: true
-    });
+const { error: uploadError } = await supabase.storage
+  .from('bukti-pembayaran')
+  .upload(filename, file, {
+    cacheControl: '3600',
+    upsert: true
+  });
 
-  if (uploadError) {
-    console.error("Upload Error:", uploadError);
-    alert('Gagal upload bukti pembayaran');
-    return;
-  }
-
-  const { data: urlData } = supabase.storage
-    .from('bukti-pembayaran')
-    .getPublicUrl(filename);
-  bukti_url = urlData.publicUrl;
+if (uploadError) {
+  console.error("Upload Error:", uploadError);
+  alert('Gagal upload bukti pembayaran');
+  return;
 }
 
+// ✅ Tambahkan `await` di sini
+const { data: urlData, error: urlError } = await supabase
+  .storage
+  .from('bukti-pembayaran')
+  .getPublicUrl(filename);
+
+if (urlError) {
+  console.error("URL Error:", urlError);
+  alert('Gagal mendapatkan link bukti pembayaran');
+  return;
+}
+
+bukti_url = urlData.publicUrl;
+  
   const { error } = await supabase.from('pesanan').insert({
     nama,
     no_hp,
