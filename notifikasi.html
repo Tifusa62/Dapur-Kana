@@ -118,6 +118,11 @@
     "https://qcevidnjbsyjfdwfduiz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI" // ganti dengan anon key asli kamu
   );
+  const urlParams = new URLSearchParams(window.location.search);
+const uidFromUrl = urlParams.get('uid');
+if (uidFromUrl) {
+  localStorage.setItem('user_id', uidFromUrl);
+}
 
   const user_id = localStorage.getItem("user_id");
 
