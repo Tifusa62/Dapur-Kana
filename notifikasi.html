@@ -120,9 +120,14 @@
   );
   const urlParams = new URLSearchParams(window.location.search);
 const uidFromUrl = urlParams.get('uid');
+
 if (uidFromUrl) {
   localStorage.setItem('user_id', uidFromUrl);
 }
+
+const user_id = localStorage.getItem("user_id");
+
+// Validasi
 if (!user_id || isNaN(user_id)) {
   window.location.href = "https://t.me/DapurKanabot?start=go";
 }
