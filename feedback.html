@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Feedback - Dapur Kana</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #00cfd3;
+      color: #fff;
+    }
+
+    h2 {
+      text-align: center;
+      color: #fff;
+    }
+
+    .pesanan {
+      background: white;
+      color: black;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      background: #004d4d;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #formFeedback {
+      background: #fff;
+      color: #000;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    input, textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #004d4d;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    a {
+      color: #004d4d;
+    }
+  </style>
+</head>
+<body>
+
+<h2>📝 Ulasan Pesanan Anda</h2>
+
+<div id="pesananContainer">Memuat pesanan...</div>
+
+<div id="formFeedback">
+  <h3>Beri Ulasan</h3>
+  <input type="hidden" id="pesananId">
+  <label>Rating (1-5):</label>
+  <input type="number" min="1" max="5" id="rating"><br>
+  <label>Komentar:</label>
+  <textarea id="komentar"></textarea><br>
+  <label>Upload Gambar (opsional):</label>
+  <input type="file" id="gambar"><br><br>
+  <button onclick="submitFeedback()">Kirim Ulasan</button>
+  <button onclick="tutupForm()">Batal</button>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+  const supabase = createClient(
+    'https://qcevidnjbsyjfdwfduiz.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'
+  );
+
+  const user_id = localStorage.getItem('user_id');
+  if (!user_id || isNaN(user_id)) {
+    window.location.href = "https://t.me/DapurKanabot?start=go";
+  }
+
+  const container = document.getElementById("pesananContainer");
+
+  async function loadPesananSelesai() {
+    const { data, error } = await supabase
+      .from("pesanan")
+      .select("*")
+      .eq("user_id", user_id)
+      .eq("status", "Selesai")
+      .order("waktu", { ascending: false });
+
+    if (error || !data.length) {
+      container.innerHTML = "<p>Tidak ada pesanan yang selesai.</p>";
+      return;
+    }
+
+    container.innerHTML = "";
+    data.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "pesanan";
+      div.innerHTML = `
+        <p><strong>Pesanan:</strong> ${p.items.map(i => `${i.nama} x ${i.qty}`).join(', ')}</p>
+        <p><strong>Total:</strong> Rp ${p.total_harga.toLocaleString()}</p>
+        <p><strong>Status:</strong> ${p.status}</p>
+        <button class="btn" onclick="bukaForm('${p.id}')">Beri Ulasan</button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  window.bukaForm = (id) => {
+    document.getElementById("pesananId").value = id;
+    document.getElementById("formFeedback").style.display = "block";
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
+
+  window.tutupForm = () => {
+    document.getElementById("formFeedback").style.display = "none";
+    document.getElementById("rating").value = "";
+    document.getElementById("komentar").value = "";
+    document.getElementById("gambar").value = "";
+  };
+
+  window.submitFeedback = async () => {
+    const pesanan_id = document.getElementById("pesananId").value;
+    const rating = parseInt(document.getElementById("rating").value);
+    const komentar = document.getElementById("komentar").value.trim();
+    const file = document.getElementById("gambar").files[0];
+
+    if (!rating || rating < 1 || rating > 5) {
+      alert("Rating wajib diisi 1–5");
+      return;
+    }
+
+    let gambar_url = "";
+    if (file) {
+      const path = `${Date.now()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage.from("feedback").upload(path, file);
+      if (uploadError) {
+        alert("Gagal upload gambar");
+        return;
+      }
+      const { data: urlData } = supabase.storage.from("feedback").getPublicUrl(path);
+      gambar_url = urlData.publicUrl;
+    }
+
+    const { error } = await supabase.from("feedback").insert({
+      user_id,
+      pesanan_id,
+      rating,
+      komentar,
+      gambar_url
+    });
+
+    if (error) {
+      alert("Gagal menyimpan ulasan");
+    } else {
+      alert("Terima kasih atas ulasannya!");
+      tutupForm();
+      loadPesananSelesai();
+    }
+  };
+
+  loadPesananSelesai();
+</script>
+
+</body>
+</html>
