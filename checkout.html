@@ -130,7 +130,9 @@
       <option value="Link Aja">Link Aja</option>
     </select>
     <div id="infoPembayaran" style="margin-top: 16px;"></div>
-    <button class="submit" onclick="submitPesanan()">Kirim Pesanan</button>
+    <label for="bukti">Upload Bukti Pembayaran</label>
+<input type="file" id="bukti" accept="image/*" />
+<button class="submit" onclick="submitPesanan()">Kirim Pesanan</button>
   </div>
 </main>
 
@@ -206,18 +208,30 @@ window.submitPesanan = async function () {
   const no_hp = document.getElementById('no_hp').value;
   const alamat = document.getElementById('alamat').value;
   const metode = document.getElementById('metode').value;
+  const buktiFile = document.getElementById('bukti').files[0];
+
   if (!nama || !no_hp || !alamat || !metode) return alert('Lengkapi semua field!');
   if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) return alert('Keranjang kosong!');
 
-  if (metode.toLowerCase() !== 'cod') {
-    const konfirmasi = confirm('Pastikan Anda sudah melakukan pembayaran sebelum melanjutkan.\nKlik OK jika sudah membayar.');
-    if (!konfirmasi) {
-      alert('Silakan lakukan pembayaran terlebih dahulu.');
-      return;
+  // Upload bukti jika ada
+  let buktiUrl = null;
+  if (buktiFile) {
+    const fileExt = buktiFile.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `bukti/${user_id}/${fileName}`;
+
+    const { data, error } = await supabase.storage.from('bukti-pembayaran').upload(filePath, buktiFile);
+    if (error) {
+      console.error("Gagal upload bukti:", error);
+      return alert('Gagal upload bukti pembayaran');
     }
+
+    const { data: publicUrlData } = supabase.storage.from('bukti-pembayaran').getPublicUrl(filePath);
+    buktiUrl = publicUrlData.publicUrl;
   }
 
-  const { error } = await supabase.from('pesanan').insert({
+  // Kirim data ke tabel pesanan
+  const { error: insertError } = await supabase.from('pesanan').insert({
     nama,
     no_hp,
     alamat,
@@ -225,12 +239,18 @@ window.submitPesanan = async function () {
     items: checkoutData.item,
     total_harga: checkoutData.total_harga,
     status: 'Menunggu',
-    user_id
+    user_id,
+    bukti_url: buktiUrl
   });
 
-  if (error) return alert('Gagal kirim pesanan.');
+  if (insertError) {
+    console.error(insertError);
+    return alert('Gagal kirim pesanan.');
+  }
 
+  // Hapus keranjang
   await supabase.from('checkout').delete().eq('id', checkoutData.id);
+
   alert('Pesanan berhasil dikirim!');
   window.location.reload();
 };
