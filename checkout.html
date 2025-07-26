@@ -132,6 +132,7 @@
     <div id="infoPembayaran" style="margin-top: 16px;"></div>
     <label for="bukti">Upload Bukti Pembayaran</label>
 <input type="file" id="bukti" accept="image/*" />
+    <img id="previewBukti" style="max-width: 100%; margin-top: 10px; display: none;" />
 <button class="submit" onclick="submitPesanan()">Kirim Pesanan</button>
   </div>
 </main>
@@ -143,16 +144,23 @@ const supabase = createClient(
   'https://qcevidnjbsyjfdwfduiz.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'
 );
-const urlParams = new URLSearchParams(window.location.search);
-const uidFromUrl = urlParams.get('uid');
-if (uidFromUrl) {
-  localStorage.setItem('user_id', uidFromUrl);
-}
+  const urlParams = new URLSearchParams(window.location.search);
+  const uidFromUrl = urlParams.get('uid');
+
+  if (uidFromUrl) {
+    localStorage.setItem('user_id', uidFromUrl);
+  }
+
+  let uid = localStorage.getItem('user_id');
+
+  // Jika tidak ada atau bukan angka (Telegram ID selalu angka), redirect
+  if (!uid || isNaN(uid)) {
+    window.location.href = "https://t.me/DapurKanabot?start=go";
+  }
 // === USER ID ===
 let user_id = localStorage.getItem('user_id');
-if (!user_id) {
-  user_id = crypto.randomUUID();
-  localStorage.setItem('user_id', user_id);
+if (!user_id || isNaN(user_id)) {
+  window.location.href = "https://t.me/DapurKanabot?start=go";
 }
 
 let checkoutData;
@@ -256,7 +264,7 @@ window.submitPesanan = async function () {
   await supabase.from('checkout').delete().eq('id', checkoutData.id);
 
   alert('Pesanan berhasil dikirim!');
-  window.location.reload();
+window.location.href = "notifikasi.html?uid=" + user_id;
 };
 
 window.openSidebar = () => {
@@ -271,6 +279,17 @@ window.closeSidebar = () => {
 
 const infoPembayaranDiv = document.getElementById("infoPembayaran");
 
+// Preview bukti pembayaran
+document.getElementById("bukti").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const preview = document.getElementById("previewBukti");
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  }
+});
+
+// Tampilkan info pembayaran dari tabel
 document.getElementById("metode").addEventListener("change", async (e) => {
   const metode = e.target.value;
   const { data, error } = await supabase
@@ -297,7 +316,6 @@ document.getElementById("metode").addEventListener("change", async (e) => {
     `;
   }
 });
-
 loadKeranjang();
 </script>
 
