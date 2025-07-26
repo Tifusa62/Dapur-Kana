@@ -123,16 +123,20 @@ const uidFromUrl = urlParams.get('uid');
 if (uidFromUrl) {
   localStorage.setItem('user_id', uidFromUrl);
 }
-
+if (!user_id || isNaN(user_id)) {
+  window.location.href = "https://t.me/DapurKanabot?start=go";
+}
   const user_id = localStorage.getItem("user_id");
 
   async function loadNotifikasi() {
     const { data, error } = await supabase
-      .from("pesanan")
-      .select("*")
-      .eq("user_id", user_id)
-      .order("waktu", { ascending: false });
+  .from("pesanan")
+  .select("*")
+  .eq("user_id", user_id)
+  .order("waktu", { ascending: false });
 
+console.log("Data:", data);
+console.log("Error:", error);
     const container = document.getElementById("notifContainer");
 
     if (error || !data || data.length === 0) {
@@ -150,14 +154,16 @@ if (uidFromUrl) {
       const card = document.createElement("div");
       card.className = "notif-card";
       card.innerHTML = `
-        <h3>Pesanan #${pesanan.id.slice(0, 6)}</h3>
-        <p><strong>Nama:</strong> ${pesanan.nama}</p>
-        <p><strong>Alamat:</strong> ${pesanan.alamat}</p>
-        <p><strong>Metode:</strong> ${pesanan.metode}</p>
-        <p><strong>Items:</strong> ${itemList}</p>
-        <p><strong>Total:</strong> Rp ${total.toLocaleString()}</p>
-        <p class="status ${pesanan.status}">${pesanan.status}</p>
-      `;
+  <h3>Pesanan #${pesanan.id.slice(0, 6)}</h3>
+  <p><strong>Waktu:</strong> ${new Date(pesanan.waktu).toLocaleString("id-ID")}</p>
+  <p><strong>Nama:</strong> ${pesanan.nama}</p>
+  <p><strong>Alamat:</strong> ${pesanan.alamat}</p>
+  <p><strong>Metode:</strong> ${pesanan.metode}</p>
+  <p><strong>Items:</strong> ${itemList}</p>
+  <p><strong>Total:</strong> Rp ${total.toLocaleString()}</p>
+  ${pesanan.bukti_url ? `<p><strong>Bukti:</strong> <a href="${pesanan.bukti_url}" target="_blank">Lihat Bukti</a></p>` : ""}
+  <p class="status ${pesanan.status}">${pesanan.status}</p>
+`;
       container.appendChild(card);
     });
   }
