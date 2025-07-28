@@ -317,6 +317,32 @@ document.getElementById("metode").addEventListener("change", async (e) => {
   }
 });
 loadKeranjang();
+
+// CEK STATUS TOKO
+const { data: statusData, error: statusError } = await supabase
+  .from("pengaturan")
+  .select("nilai")
+  .eq("nama", "status_toko")
+  .single();
+
+if (!statusError && statusData?.nilai === "tutup") {
+  const tombol = document.querySelector("button.submit");
+  tombol.disabled = true;
+  tombol.style.opacity = "0.5";
+  tombol.style.cursor = "not-allowed";
+
+  const infoTutup = document.createElement("div");
+  infoTutup.innerHTML = `
+    <div style="background:#ffeaea;padding:12px;border-left:5px solid red;margin-top:20px;border-radius:8px">
+      ❌ <b>Toko sedang tutup.</b><br>Saat ini kami tidak menerima pesanan. Anda tetap dapat melihat menu.
+    </div>`;
+  document.querySelector(".form-container").prepend(infoTutup);
+
+  // Cegah submit
+  window.submitPesanan = function () {
+    alert("Maaf, toko sedang tutup dan tidak menerima pesanan saat ini.");
+  };
+}
 </script>
 
 </body>
