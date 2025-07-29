@@ -229,7 +229,7 @@ window.submitPesanan = async function () {
   const alamat = document.getElementById('alamat').value;
   const metode = document.getElementById('metode').value;
   const buktiFile = document.getElementById('bukti').files[0];
-  const waktu_kirim = document.getElementById('waktu_kirim).value;
+  const waktu_kirim = document.getElementById('waktu_kirim').value;
 
   if (!nama || !no_hp || !alamat || !waktu_kirim || !metode) return alert('Lengkapi semua field!');
   if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) return alert('Keranjang kosong!');
