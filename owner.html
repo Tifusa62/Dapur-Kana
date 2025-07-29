@@ -1,187 +1,340 @@
-<!-- Versi Final Owner Panel Dapur Kana dengan Pengaturan Toko -->
 <!DOCTYPE html>
+
 <html lang="id">
 
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>Owner Panel - Dapur Kana</title>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
+
     body {
+
       margin: 0;
+
       font-family: 'Segoe UI', sans-serif;
+
       background: #00cfd3;
+
       color: #fff;
+
     }
+
     header {
+
       background-color: #004d4d;
+
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
+
       padding: 12px 20px;
+
     }
+
     .brand {
+
       font-family: 'Georgia', serif;
+
       font-size: 24px;
+
       font-weight: bold;
+
     }
+
     .hamburger {
+
       display: none;
+
       font-size: 28px;
+
+      height: 30px;
+
+      width: 30px;
+
+      align-items: left;
+
       cursor: pointer;
+
       background: none;
+
       border: none;
+
       color: white;
+
     }
+
     .sidebar {
+
       position: fixed;
+
       top: 0;
+
       left: -250px;
+
       height: 100%;
+
       width: 250px;
+
       background: #004d4d;
+
       padding-top: 60px;
+
       transition: left 0.3s ease;
+
       z-index: 100;
+
     }
+
     .sidebar a {
+
       display: block;
+
       padding: 14px 20px;
+
       color: white;
+
       text-decoration: none;
+
       font-weight: bold;
+
     }
+
     .sidebar a:hover {
+
       background: #007979;
+
     }
+
     main {
+
       padding: 20px;
+
     }
+
     .hidden {
+
       display: none;
+
     }
+
     input, textarea, button {
+
       display: block;
+
       width: 100%;
+
       margin: 10px 0;
+
       padding: 10px;
+
       border-radius: 20px;
+
       border: none;
+
       font-size: 16px;
+
     }
+
     button {
+
       background: #004d4d;
+
       color: white;
+
       cursor: pointer;
+
     }
+
+    .upload-area {
+
+      width: 100%;
+
+      max-width: 300px;
+
+      height: 150px;
+
+      background: #004d4d;
+
+      border-radius: 1rem;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      color: white;
+
+      margin: 10px 0;
+
+    }
+
+    .menu-item {
+
+      background: #007979;
+
+      padding: 10px;
+
+      border-radius: 12px;
+
+      margin: 10px 0;
+
+    }
+
+    img {
+
+      max-width: 100px;
+
+      border-radius: 1rem;
+
+      margin-top: 8px;
+
+    }
+
+    h2 {
+
+      text-align: center;
+
+      font-family: Georgia, serif;
+
+      margin-top: 20px;
+
+    }
+
     @media (max-width: 600px) {
-      #statSummary div {
-        min-width: 100% !important;
-      }
-    }
+  #statSummary div {
+    min-width: 100% !important;
+  }
+}
+
   </style>
+
 </head>
 
 <body>
+
+  <!-- Sidebar -->
+  
   <div id="sidebar" class="sidebar">
     <a href="#" onclick="showSection('dashboard')">📊 Dashboard</a>
-    <a href="#" onclick="showSection('pengaturan')">🔧 Pengaturan</a>
+
+    <a href="#" onclick="showSection('editMenu')">🍔 Edit Menu</a>
+
+    <a href="#" onclick="showSection('editBanner')">🖼️ Edit Banners</a>
+
     <a href="#" onclick="logout()">🚪 Logout</a>
+
   </div>
 
+
+
+  <!-- Header -->
+
   <header>
+
     <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <div class="brand">Owner Panel</div>
+
+    <div class="brand">Owner panel</div>
+
   </header>
 
+
+
+  <!-- Login -->
+
   <main>
+
     <section id="loginSection">
+
       <h2>Login Owner</h2>
+
       <form id="loginForm">
+
         <input type="email" id="email" placeholder="Email" required />
+
         <input type="password" id="password" placeholder="Password" required />
+
         <button type="submit">Login</button>
+
       </form>
+
+    </section>
+    
+    <!-- Dashboard -->
+<section id="dashboard" class="hidden">
+  <h2>📊 Dashboard Penjualan</h2>
+  <div id="statSummary" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 20px;"></div>
+  <button onclick="loadDashboard()" style="margin: 10px auto; display:block;">🔄 Refresh Dashboard</button>
+  <canvas id="chart7Days" style="max-width: 600px; margin: 30px auto;"></canvas>
+</section>
+
+    <section class="p-4 hidden" id="pengaturan">
+  <h2 class="text-xl font-bold mb-2">🔧 Pengaturan Toko</h2>
+  <button id="toggleToko" class="bg-[#00cfd3] text-white px-4 py-2 rounded-lg shadow">
+    🔄 Loading status...
+  </button>
+</section>
+
+    <!-- Edit Menu -->
+
+    <section id="editMenu" class="hidden">
+
+      <h2>Edit Menu</h2>
+
+      <form id="menuForm">
+
+        <input type="hidden" id="menuId" />
+
+        <input type="text" id="nama" placeholder="Nama Menu" required />
+
+        <input type="number" id="harga" placeholder="Harga" required />
+
+        <input type="text" id="kategori" placeholder="Kategori" required />
+
+        <textarea id="deskripsi" placeholder="Deskripsi"></textarea>
+
+        <input type="file" id="gambar" />
+
+        <button type="submit">Simpan Menu</button>
+
+      </form>
+
+      <div id="menuList"></div>
     </section>
 
-    <section id="dashboard" class="hidden">
-      <h2>📊 Dashboard Penjualan</h2>
-      <div id="statSummary" style="display: flex; flex-wrap: wrap; gap: 20px;"></div>
+    <!-- Edit Banners -->
+
+    <section id="editBanner" class="hidden">
+
+<h2>Edit Halaman Beranda (Banner)</h2>
+
+<form id="formBanner" style="margin-bottom:2rem;">
+
+  <input type="text" id="judulBanner" placeholder="Judul Banner" required><br><br>
+
+  <input type="text" id="subjudulBanner" placeholder="Subjudul Banner" required><br><br>
+
+  <input type="file" id="bannerUpload" accept="image/*" required><br><br>
+
+  <button type="submit" id="uploadBannerBtn">Upload Banner</button>
+
+</form>
+
+<div id="bannerList"></div>
+
     </section>
 
-    <section id="pengaturan" class="hidden">
-      <h2 class="text-xl font-bold mb-2">🔧 Pengaturan Toko</h2>
-      <button id="toggleToko" class="bg-[#00cfd3] text-white px-4 py-2 rounded-lg shadow">
-        🔄 Loading status...
-      </button>
-    </section>
   </main>
 
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-    const supabase = createClient(
-      "https://qcevidnjbsyjfdwfduiz.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    );
-
-    window.toggleSidebar = () => {
-      const sidebar = document.getElementById("sidebar");
-      sidebar.style.left = sidebar.style.left === "0px" ? "-250px" : "0px";
-    };
-
-    window.showSection = (id) => {
-      document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
-      toggleSidebar();
-      if (id === 'pengaturan') loadStatusToko();
-    };
-
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error || data.user.email !== "oishidzato@gmail.com") return alert("Login gagal!");
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("dashboard").classList.remove("hidden");
-      document.querySelector(".hamburger").style.display = "block";
-    });
-
-    window.logout = async () => {
-      await supabase.auth.signOut();
-      location.reload();
-    };
-
-    async function loadStatusToko() {
-      const tombol = document.getElementById("toggleToko");
-      if (!tombol) return;
-      const { data, error } = await supabase.from('pengaturan').select('*').eq('nama', 'status_toko').single();
-      if (error || !data) {
-        tombol.innerText = "❌ Gagal memuat status";
-        return;
-      }
-      let status = data.nilai;
-      tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
-      tombol.onclick = async () => {
-        const nilaiBaru = status === "buka" ? "tutup" : "buka";
-        const { error } = await supabase.from('pengaturan')
-          .update({ nilai: nilaiBaru, updated_at: new Date().toISOString() })
-          .eq('nama', 'status_toko');
-        if (!error) {
-          status = nilaiBaru;
-          tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
-          alert(`Status toko diubah menjadi: ${status.toUpperCase()}`);
-        } else {
-          alert("Gagal memperbarui status toko");
-        }
-      };
-    }
-  </script>
-</body>
-
-</html>
 
 
   <script type="module">
@@ -258,58 +411,48 @@ loadStatusToko(); // ✅ Tambahkan ini
 
     // Logout
 
-window.toggleSidebar = () => {
-      const sidebar = document.getElementById("sidebar");
-      sidebar.style.left = sidebar.style.left === "0px" ? "-250px" : "0px";
-    };
-
-    window.showSection = (id) => {
-      document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
-      toggleSidebar();
-      if (id === 'pengaturan') loadStatusToko();
-    };
-
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error || data.user.email !== "oishidzato@gmail.com") return alert("Login gagal!");
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("dashboard").classList.remove("hidden");
-      document.querySelector(".hamburger").style.display = "block";
-    });
-
     window.logout = async () => {
-      await supabase.auth.signOut();
-      location.reload();
-    };
 
-    async function loadStatusToko() {
-      const tombol = document.getElementById("toggleToko");
-      if (!tombol) return;
-      const { data, error } = await supabase.from('pengaturan').select('*').eq('nama', 'status_toko').single();
-      if (error || !data) {
-        tombol.innerText = "❌ Gagal memuat status";
-        return;
-      }
-      let status = data.nilai;
-      tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
-      tombol.onclick = async () => {
-        const nilaiBaru = status === "buka" ? "tutup" : "buka";
-        const { error } = await supabase.from('pengaturan')
-          .update({ nilai: nilaiBaru, updated_at: new Date().toISOString() })
-          .eq('nama', 'status_toko');
-        if (!error) {
-          status = nilaiBaru;
-          tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
-          alert(`Status toko diubah menjadi: ${status.toUpperCase()}`);
-        } else {
-          alert("Gagal memperbarui status toko");
-        }
-      };
+      await supabase.auth.signOut();
+
+      location.reload();
+
     }
+    async function loadStatusToko() {
+  const tombol = document.getElementById("toggleToko");
+  let { data, error } = await supabase
+    .from('pengaturan')
+    .select('*')
+    .eq('nama', 'status_toko')
+    .single();
+
+  if (error || !data) {
+    tombol.innerText = "❌ Gagal memuat status";
+    return;
+  }
+
+  let status = data.nilai;
+
+  tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
+
+  tombol.onclick = async () => {
+    const nilaiBaru = status === "buka" ? "tutup" : "buka";
+    const { error } = await supabase
+      .from('pengaturan')
+      .update({ nilai: nilaiBaru, updated_at: new Date().toISOString() })
+      .eq('nama', 'status_toko');
+
+    if (!error) {
+      status = nilaiBaru;
+      tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
+      alert(`Status toko diubah menjadi: ${status.toUpperCase()}`);
+    } else {
+      alert("Gagal memperbarui status toko");
+    }
+  };
+}
+
+
     
 async function loadDashboard() {
   const today = new Date().toISOString().split('T')[0];
