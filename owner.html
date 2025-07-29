@@ -287,7 +287,6 @@
     <!-- Edit Menu -->
 
     <section id="editMenu" class="hidden">
-    <div id="pilihanContainer"></div>
 
       <h2>Edit Menu</h2>
 
@@ -399,11 +398,12 @@
       document.getElementById("loginSection").classList.add("hidden");
 document.getElementById("dashboard").classList.remove("hidden");
 document.querySelector(".hamburger").style.display = "block";
-      
+      document.getElementById("pengaturan").classList.remove("hidden");
+
 loadDashboard(); 
 loadMenu();
 loadBannerList();
-
+loadStatusToko(); // ✅ Tambahkan ini
 
     });
 
@@ -418,6 +418,40 @@ loadBannerList();
       location.reload();
 
     }
+    async function loadStatusToko() {
+  const tombol = document.getElementById("toggleToko");
+  let { data, error } = await supabase
+    .from('pengaturan')
+    .select('*')
+    .eq('nama', 'status_toko')
+    .single();
+
+  if (error || !data) {
+    tombol.innerText = "❌ Gagal memuat status";
+    return;
+  }
+
+  let status = data.nilai;
+
+  tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
+
+  tombol.onclick = async () => {
+    const nilaiBaru = status === "buka" ? "tutup" : "buka";
+    const { error } = await supabase
+      .from('pengaturan')
+      .update({ nilai: nilaiBaru, updated_at: new Date().toISOString() })
+      .eq('nama', 'status_toko');
+
+    if (!error) {
+      status = nilaiBaru;
+      tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
+      alert(`Status toko diubah menjadi: ${status.toUpperCase()}`);
+    } else {
+      alert("Gagal memperbarui status toko");
+    }
+  };
+}
+
 
     
 async function loadDashboard() {
@@ -506,66 +540,28 @@ async function loadDashboard() {
       list.innerHTML = "";
 
       data.forEach(item => {
-  const div = document.createElement("div");
-  div.className = "menu-item";
-  div.innerHTML = `
-    <strong>${item.nama}</strong> - Rp${item.harga}<br/>
-    <img src="${item.gambar_url}" />
-    <button onclick='editMenu(${JSON.stringify(item)})'>Edit</button>
-    <button onclick='hapusMenu("${item.id}")'>Hapus</button>
-    <div id="pilihanContainer-${item.id}">Memuat topping...</div>
-  `;
-  list.appendChild(div);
-  tampilkanPilihan(item.id, div.querySelector(`#pilihanContainer-${item.id}`));
-});
+
+        const div = document.createElement("div");
+
+        div.className = "menu-item";
+
+        div.innerHTML = `
+
+          <strong>${item.nama}</strong> - Rp${item.harga}<br/>
+
+          <img src="${item.gambar_url}" />
+
+          <button onclick='editMenu(${JSON.stringify(item)})'>Edit</button>
+
+          <button onclick='hapusMenu("${item.id}")'>Hapus</button>
+
+        `;
+
+        list.appendChild(div);
+
+      });
 
     }
-    
-    // Muat dan tampilkan pilihan (topping) untuk menu tertentu
-async function tampilkanPilihan(menuId, container) {
-  const { data: pilihanList, error } = await supabase.from('pilihan').select('*').eq('menu_id', menuId);
-  if (error) {
-    container.innerHTML = "<p>Gagal memuat pilihan.</p>";
-    return;
-  }
-
-  container.innerHTML = `
-    <div style="margin-top:10px;">
-      <h4 style="margin-bottom: 6px;">Pilihan / Topping:</h4>
-      <ul id="pilihanList-${menuId}" style="padding-left: 20px;">
-        ${pilihanList.map(p => `
-          <li>
-            ${p.nama} - Rp${p.harga}
-            <button onclick="hapusPilihan('${p.id}', '${menuId}')">❌</button>
-          </li>
-        `).join('')}
-      </ul>
-
-      <input type="text" id="toppingNama-${menuId}" placeholder="Nama Topping">
-      <input type="number" id="toppingHarga-${menuId}" placeholder="Harga">
-      <button onclick="tambahPilihan('${menuId}')">➕ Tambah Pilihan</button>
-    </div>
-  `;
-}
-
-// Tambahkan pilihan baru
-window.tambahPilihan = async function(menuId) {
-  const nama = document.getElementById(`toppingNama-${menuId}`).value;
-  const harga = parseInt(document.getElementById(`toppingHarga-${menuId}`).value);
-  if (!nama || isNaN(harga)) return alert("Lengkapi nama dan harga topping.");
-
-  await supabase.from('pilihan').insert({ menu_id: menuId, nama, harga });
-  const container = document.getElementById(`pilihanContainer-${menuId}`);
-  tampilkanPilihan(menuId, container);
-}
-
-// Hapus pilihan
-window.hapusPilihan = async function(pilihanId, menuId) {
-  if (!confirm("Hapus pilihan ini?")) return;
-  await supabase.from('pilihan').delete().eq('id', pilihanId);
-  const container = document.getElementById(`pilihanContainer-${menuId}`);
-  tampilkanPilihan(menuId, container);
-}
 
 
 
