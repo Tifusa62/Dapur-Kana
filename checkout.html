@@ -124,6 +124,12 @@
     <input type="text" id="nama" placeholder="Nama lengkap" />
     <input type="text" id="no_hp" placeholder="Nomor HP" />
     <input type="text" id="alamat" placeholder="Alamat lengkap" />
+    <label for="waktu_kirim">Pilih Waktu Pengiriman:</label>
+    <select id="waktu_kirim" required>
+      <option value="">-- Pilih --</option>
+      <option value="Pagi (07:30 - 09:30)">Pagi (07:30 - 09:30)</option>
+      <option value="Siang (11:00 - 13:00)">Siang (11:00 - 13:00)</option>
+    </select>
     <select id="metode">
       <option value="">Pilih Metode Pembayaran</option>
       <option value="BCA">Bank Centra Asia</option>
@@ -221,8 +227,9 @@ window.submitPesanan = async function () {
   const alamat = document.getElementById('alamat').value;
   const metode = document.getElementById('metode').value;
   const buktiFile = document.getElementById('bukti').files[0];
+  const waktu_kirim = document.getElementById('waktu_kirim).value;
 
-  if (!nama || !no_hp || !alamat || !metode) return alert('Lengkapi semua field!');
+  if (!nama || !no_hp || !alamat || !waktu_kirim || !metode) return alert('Lengkapi semua field!');
   if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) return alert('Keranjang kosong!');
 
   // Upload bukti jika ada
@@ -247,6 +254,7 @@ window.submitPesanan = async function () {
     nama,
     no_hp,
     alamat,
+    waktu_kirim,
     metode,
     items: checkoutData.item,
     total_harga: checkoutData.total_harga,
