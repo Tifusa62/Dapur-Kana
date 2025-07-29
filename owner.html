@@ -277,7 +277,7 @@
   <canvas id="chart7Days" style="max-width: 600px; margin: 30px auto;"></canvas>
 </section>
 
-    <section class="p-4" id="pengaturan">
+    <section class="p-4 hidden" id="pengaturan">
   <h2 class="text-xl font-bold mb-2">🔧 Pengaturan Toko</h2>
   <button id="toggleToko" class="bg-[#00cfd3] text-white px-4 py-2 rounded-lg shadow">
     🔄 Loading status...
@@ -309,10 +309,7 @@
       </form>
 
       <div id="menuList"></div>
-
-      </section>
-
-
+    </section>
 
     <!-- Edit Banners -->
 
@@ -354,33 +351,6 @@
 
 
 
-// === Status Toko ===
-const { data, error } = await supabase
-  .from('pengaturan')
-  .select('*')
-  .eq('nama', 'status_toko')
-  .single();
-
-const tombol = document.getElementById("toggleToko");
-let status = data?.nilai || "buka";
-
-tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
-
-tombol.onclick = async () => {
-  const nilaiBaru = status === "buka" ? "tutup" : "buka";
-  const { error } = await supabase
-    .from('pengaturan')
-    .update({ nilai: nilaiBaru, updated_at: new Date().toISOString() })
-    .eq('nama', 'status_toko');
-
-  if (!error) {
-    status = nilaiBaru;
-    tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
-    alert(`Status toko diubah menjadi: ${status.toUpperCase()}`);
-  } else {
-    alert("Gagal memperbarui status toko");
-  }
-};
     // Sidebar
 
     window.toggleSidebar = () => {
@@ -426,12 +396,14 @@ tombol.onclick = async () => {
 
 
       document.getElementById("loginSection").classList.add("hidden");
-document.getElementById("dashboard").classList.remove("hidden"); // Ganti dari 'laporan' ke 'dashboard'
+document.getElementById("dashboard").classList.remove("hidden");
 document.querySelector(".hamburger").style.display = "block";
-loadDashboard(); // Panggil fungsi dashboard
+      document.getElementById("pengaturan").style.display = "hidden";
+
+loadDashboard(); 
 loadMenu();
 loadBannerList();
-      loadBannerList();
+loadStatusToko(); // ✅ Tambahkan ini
 
     });
 
@@ -446,7 +418,42 @@ loadBannerList();
       location.reload();
 
     }
+    async function loadStatusToko() {
+  const tombol = document.getElementById("toggleToko");
+  let { data, error } = await supabase
+    .from('pengaturan')
+    .select('*')
+    .eq('nama', 'status_toko')
+    .single();
 
+  if (error || !data) {
+    tombol.innerText = "❌ Gagal memuat status";
+    return;
+  }
+
+  let status = data.nilai;
+
+  tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
+
+  tombol.onclick = async () => {
+    const nilaiBaru = status === "buka" ? "tutup" : "buka";
+    const { error } = await supabase
+      .from('pengaturan')
+      .update({ nilai: nilaiBaru, updated_at: new Date().toISOString() })
+      .eq('nama', 'status_toko');
+
+    if (!error) {
+      status = nilaiBaru;
+      tombol.innerText = status === "buka" ? "🟢 Toko Buka (Klik Tutup)" : "🔴 Toko Tutup (Klik Buka)";
+      alert(`Status toko diubah menjadi: ${status.toUpperCase()}`);
+    } else {
+      alert("Gagal memperbarui status toko");
+    }
+  };
+}
+
+
+    
 async function loadDashboard() {
   const today = new Date().toISOString().split('T')[0];
   const { data: pesanan } = await supabase.from('pesanan').select('*');
