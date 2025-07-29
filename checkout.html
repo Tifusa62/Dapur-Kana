@@ -266,9 +266,10 @@ window.submitPesanan = async function () {
   });
 
   if (insertError) {
-    console.error(insertError);
-    return alert('Gagal kirim pesanan.');
-  }
+  console.error("Insert error:", insertError.message, insertError.details);
+  alert('Gagal kirim pesanan: ' + insertError.message);
+  return;
+}
 
   // Hapus keranjang
   await supabase.from('checkout').delete().eq('id', checkoutData.id);
