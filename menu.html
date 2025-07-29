@@ -312,8 +312,7 @@ select {
 
 </head>
 
-<body>
-  <header>
+<body><header>
 
   <button class="hamburger" onclick="openSidebar()">☰</button>
 
@@ -353,8 +352,7 @@ select {
 
   <div class="menu-grid" id="menuContainer">Memuat menu...</div>
 
-</main>
-  <div id="menuModal" class="modal" onclick="closeModal()">
+</main><div id="menuModal" class="modal" onclick="closeModal()">
 
   <div class="modal-content" onclick="event.stopPropagation()">
 
@@ -370,11 +368,7 @@ select {
 
   </div>
 
-</div>
-  
-  <script type="module">
-    let menuYangDipilih = null;
-    let toppingDipilih = [];
+</div><script type="module">
 
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
@@ -411,7 +405,7 @@ function cekJamOperasional() {
   const menit = now.getMinutes();
 
   // Toko tutup dari jam 21:00 sampai jam 12:59
-  const sedangTutup = (jam >= 23 || jam < 15 || (jam === 15 && menit === 0));
+  const sedangTutup = (jam >= 21 || jam < 15 || (jam === 15 && menit === 0));
 
   if (sedangTutup) {
     // Nonaktifkan tombol terkait pesanan
@@ -434,58 +428,7 @@ function cekJamOperasional() {
   }
 }
 
-  async function tambahKeKeranjang(menu) {
-  // Ambil pilihan dari Supabase
-  const { data: pilihan } = await supabase
-    .from('pilihan')
-    .select('*')
-    .eq('menu_id', menu.id);
-
-  if (pilihan && pilihan.length > 0) {
-    // Tampilkan modal topping
-    menuYangDipilih = menu;
-    toppingDipilih = [];
-    tampilkanModalTopping(pilihan);
-  } else {
-    // Tidak ada topping, langsung simpan
-    simpanCheckout(menu, []);
-  }
-}
-    function tampilkanModalTopping(pilihan) {
-  const modal = document.getElementById("toppingModal");
-  const list = document.getElementById("toppingList");
-  list.innerHTML = "";
-
-  pilihan.forEach(p => {
-    const el = document.createElement("div");
-    el.innerHTML = `
-      <label class="flex items-center space-x-2">
-        <input type="checkbox" value="${p.nama}|${p.harga}" class="toppingCheck" />
-        <span>${p.nama} (+Rp ${p.harga})</span>
-      </label>
-    `;
-    list.appendChild(el);
-  });
-
-  modal.classList.remove("hidden");
-}
-
-document.getElementById("batalTopping").onclick = () => {
-  document.getElementById("toppingModal").classList.add("hidden");
-};
-
-document.getElementById("simpanTopping").onclick = () => {
-  toppingDipilih = Array.from(document.querySelectorAll(".toppingCheck"))
-    .filter(cb => cb.checked)
-    .map(cb => {
-      const [nama, harga] = cb.value.split("|");
-      return { nama, harga: parseInt(harga) };
-    });
-
-  document.getElementById("toppingModal").classList.add("hidden");
-  simpanCheckout(menuYangDipilih, toppingDipilih);
-};
-    async function loadMenu() {
+  async function loadMenu() {
 
     const { data, error } = await supabase.from("menu").select("*").order("nama");
 
@@ -530,8 +473,9 @@ document.getElementById("simpanTopping").onclick = () => {
         <div class="actions">
         <button class="btn-minus" onclick="kurangItem('${item.id}')">-</button>
         <span id="qty-${item.id}">0</span>
-        <button class="btn-plus" onclick='tambahKeKeranjang(${JSON.stringify(item)})'>+</button>
+        <button class="btn-plus" onclick="tambahItem('${item.id}', ${item.harga}, '${item.nama}')">+</button>
         </div>
+
       `;
 
       div.addEventListener("click", (e) => {
@@ -625,44 +569,13 @@ document.getElementById("simpanTopping").onclick = () => {
 
   }
 
-async function simpanCheckout(menu, topping = []) {
-  const user_id = localStorage.getItem("user_id");
-  const hargaTopping = topping.reduce((sum, t) => sum + t.harga, 0);
-  const total = menu.harga + hargaTopping;
 
-  const item = {
-    id_menu: menu.id,
-    nama: menu.nama,
-    harga: menu.harga,
-    jumlah: 1,
-    topping, // Simpan pilihan
-    total: total
-  };
-
-  const { error } = await supabase
-    .from("checkout")
-    .insert([
-      {
-        item,
-        total_harga: total,
-        status: "draft",
-        user_id
-      }
-    ]);
-
-  if (!error) {
-    alert("✅ Menu ditambahkan ke keranjang!");
-  } else {
-    console.error(error);
-    alert("❌ Gagal menambahkan ke keranjang");
-  }
-}
 
   async function tambahItem(id, harga, nama) {
   const now = new Date();
   const jam = now.getHours();
   const menit = now.getMinutes();
-  if (jam >= 23 || jam < 15 || (jam === 15 && menit === 0)) {
+  if (jam >= 21 || jam < 15 || (jam === 15 && menit === 0)) {
     return;
   }
 
@@ -790,20 +703,6 @@ async function simpanCheckout(menu, topping = []) {
 
   loadMenu();
 
-</script>
-  <!-- Modal Pilihan Topping -->
-<div id="toppingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
-  <div class="bg-white p-4 rounded-lg w-80 shadow-lg relative">
-    <h3 class="text-lg font-bold mb-2">Pilih Tambahan</h3>
-    <div id="toppingList" class="space-y-2 mb-4">
-      <!-- Opsi topping dimuat di sini -->
-    </div>
-    <div class="flex justify-end space-x-2">
-      <button id="batalTopping" class="bg-gray-300 px-3 py-1 rounded">Batal</button>
-      <button id="simpanTopping" class="bg-[#00cfd3] text-white px-3 py-1 rounded">Simpan</button>
-    </div>
-  </div>
-</div>
-</body>
+</script></body>
 
 </html>
