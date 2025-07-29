@@ -184,32 +184,19 @@ async function loadKeranjang() {
 
   let total = 0;
   container.innerHTML = data.item.map(item => {
-  const toppingHarga = item.pilihan?.reduce((sum, p) => sum + p.harga, 0) || 0;
-  const hargaTotal = item.qty * (item.harga + toppingHarga);
-
-  let toppingList = "";
-  if (item.pilihan && Array.isArray(item.pilihan) && item.pilihan.length > 0) {
-    toppingList = `
-      <ul style="font-size: 14px; margin: 4px 0 0 12px; color: #555;">
-        ${item.pilihan.map(p => `<li>+ ${p.nama} (Rp ${p.harga.toLocaleString()})</li>`).join('')}
-      </ul>
-    `;
-  }
-
-  return `
-    <div class="keranjang-item">
-      <div>
-        <div><strong>${item.nama}</strong></div>
-        ${toppingList}
-      </div>
-      <div class="qty-control">
-        <button onclick="kurangItem('${item.id}')">-</button>
-        <span id="qty-${item.id}">${item.qty}</span>
-        <button onclick="tambahItem('${item.id}')">+</button>
-      </div>
-      <div>Rp ${hargaTotal.toLocaleString()}</div>
-    </div>`;
-}).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+    total += item.qty * item.harga;
+    return `
+      <div class="keranjang-item">
+        <div>${item.nama}</div>
+        <div class="qty-control">
+          <button onclick="kurangItem('${item.id}')">-</button>
+          <span id="qty-${item.id}">${item.qty}</span>
+          <button onclick="tambahItem('${item.id}')">+</button>
+        </div>
+        <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
+      </div>`;
+  }).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+}
 
 window.tambahItem = async function (id) {
   const items = checkoutData.item;
