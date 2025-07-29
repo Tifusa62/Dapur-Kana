@@ -164,7 +164,7 @@ const supabase = createClient(
     window.location.href = "https://t.me/DapurKanabot?start=go";
   }
 // === USER ID ===
-let user_id = String(localStorage.getItem('user_id') || "");
+let user_id = localStorage.getItem('user_id');
 if (!user_id || isNaN(user_id)) {
   window.location.href = "https://t.me/DapurKanabot?start=go";
 }
