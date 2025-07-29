@@ -578,7 +578,6 @@ document.addEventListener("DOMContentLoaded", cekJamOperasional);
   const jam = now.getHours();
   const menit = now.getMinutes();
   if (jam >= 21 || jam < 15 || (jam === 15 && menit === 0)) {
-    alert("Toko sedang tutup. Silakan kembali setelah jam 15:01.");
     return;
   }
 
