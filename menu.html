@@ -507,6 +507,7 @@ document.addEventListener("DOMContentLoaded", cekJamOperasional);
       filterSelect.appendChild(option);
 
     });
+    cekJamOperasional()
 
   }
 
@@ -573,6 +574,15 @@ document.addEventListener("DOMContentLoaded", cekJamOperasional);
 
 
   async function tambahItem(id, harga, nama) {
+  const now = new Date();
+  const jam = now.getHours();
+  const menit = now.getMinutes();
+  if (jam >= 21 || jam < 15 || (jam === 15 && menit === 0)) {
+    alert("Toko sedang tutup. Silakan kembali setelah jam 15:01.");
+    return;
+  }
+
+  // ...lanjutkan isi fungsi tambahItem seperti biasa
 
     const qtySpan = document.getElementById("qty-" + id);
 
