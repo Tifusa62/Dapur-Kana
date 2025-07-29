@@ -428,8 +428,6 @@ function cekJamOperasional() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", cekJamOperasional);
-
   async function loadMenu() {
 
     const { data, error } = await supabase.from("menu").select("*").order("nama");
