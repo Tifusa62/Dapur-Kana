@@ -399,7 +399,36 @@ if (uidFromUrl) {
 
   const filterSelect = document.getElementById("filterKategori");
 
+function cekJamOperasional() {
+  const now = new Date();
+  const jam = now.getHours();
+  const menit = now.getMinutes();
 
+  // Toko tutup dari jam 21:00 sampai jam 12:59
+  const sedangTutup = (jam >= 21 || jam < 13 || (jam === 13 && menit === 0));
+
+  if (sedangTutup) {
+    // Nonaktifkan tombol terkait pesanan
+    document.querySelectorAll(".btn-plus, .btn-minus, .pesan-btn").forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = 0.5;
+      btn.style.cursor = "not-allowed";
+    });
+
+    // Tampilkan banner notifikasi
+    const notif = document.createElement("div");
+    notif.style.background = "#ff4d4d";
+    notif.style.color = "white";
+    notif.style.padding = "12px";
+    notif.style.borderRadius = "12px";
+    notif.style.textAlign = "center";
+    notif.style.margin = "12px";
+    notif.innerHTML = "⚠️ Toko tutup dari jam 21:00 sampai 13:00. Silakan kembali setelah jam 13:01.";
+    document.body.prepend(notif);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", cekJamOperasional);
 
   async function loadMenu() {
 
@@ -444,13 +473,9 @@ if (uidFromUrl) {
         <p>Rp ${item.harga.toLocaleString()}</p>
 
         <div class="actions">
-
-          <button onclick="kurangItem('${item.id}')">-</button>
-
-          <span id="qty-${item.id}">0</span>
-
-          <button onclick="tambahItem('${item.id}', ${item.harga}, '${item.nama}')">+</button>
-
+        <button class="btn-minus" onclick="kurangItem('${item.id}')">-</button>
+        <span id="qty-${item.id}">0</span>
+        <button class="btn-plus" onclick="tambahItem('${item.id}', ${item.harga}, '${item.nama}')">+</button>
         </div>
 
       `;
