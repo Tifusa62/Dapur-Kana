@@ -405,7 +405,7 @@ function cekJamOperasional() {
   const menit = now.getMinutes();
 
   // Toko tutup dari jam 21:00 sampai jam 12:59
-  const sedangTutup = (jam >= 21 || jam < 13 || (jam === 13 && menit === 0));
+  const sedangTutup = (jam >= 21 || jam < 15 || (jam === 15 && menit === 0));
 
   if (sedangTutup) {
     // Nonaktifkan tombol terkait pesanan
@@ -423,7 +423,7 @@ function cekJamOperasional() {
     notif.style.borderRadius = "12px";
     notif.style.textAlign = "center";
     notif.style.margin = "12px";
-    notif.innerHTML = "⚠️ Toko tutup dari jam 21:00 sampai 13:00. Silakan kembali setelah jam 13:01.";
+    notif.innerHTML = "⚠️ Toko tutup dari jam 21:00 sampai 15:00. Silakan kembali setelah jam 15:01.";
     document.body.prepend(notif);
   }
 }
