@@ -131,14 +131,17 @@
       <option value="Siang (11:00 - 13:00)">Siang (11:00 - 13:00)</option>
     </select>
     <select id="metode">
-      <option value="">Pilih Metode Pembayaran</option>
-      <option value="BCA">Bank Centra Asia</option>
-      <option value="Link Aja">Link Aja</option>
-    </select>
+  <option value="">Pilih Metode Pembayaran</option>
+  <option value="COD">Bayar di Tempat (COD)</option>
+  <option value="BCA">Bank Central Asia (BCA)</option>
+  <option value="Link Aja">Link Aja</option>
+</select>
     <div id="infoPembayaran" style="margin-top: 16px;"></div>
-    <label for="bukti">Upload Bukti Pembayaran</label>
-<input type="file" id="bukti" accept="image/*" />
-    <img id="previewBukti" style="max-width: 100%; margin-top: 10px; display: none;" />
+    <div id="buktiSection" style="display:none;">
+  <label for="bukti">Upload Bukti Pembayaran</label>
+  <input type="file" id="bukti" accept="image/*" />
+  <img id="previewBukti" style="max-width: 100%; margin-top: 10px; display: none;" />
+</div>
 <button class="submit" onclick="submitPesanan()">Kirim Pesanan</button>
   </div>
 </main>
@@ -236,7 +239,8 @@ window.submitPesanan = async function () {
 
   // Upload bukti jika ada
   let buktiUrl = null;
-  if (buktiFile) {
+if (metode !== "COD" && buktiFile) {
+  // proses upload...
     const fileExt = buktiFile.name.split('.').pop();
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `bukti/${user_id}/${fileName}`;
@@ -303,6 +307,20 @@ document.getElementById("bukti").addEventListener("change", (e) => {
 // Tampilkan info pembayaran dari tabel
 document.getElementById("metode").addEventListener("change", async (e) => {
   const metode = e.target.value;
+
+  const buktiSection = document.getElementById("buktiSection");
+  const infoPembayaranDiv = document.getElementById("infoPembayaran");
+
+  // Jika COD, sembunyikan upload bukti dan info pembayaran
+  if (metode === "COD") {
+    buktiSection.style.display = "none";
+    infoPembayaranDiv.innerHTML = `<p><strong>Pembayaran akan dilakukan langsung saat pengantaran.</strong></p>`;
+    return;
+  } else {
+    buktiSection.style.display = "block";
+  }
+
+  // Ambil info pembayaran dari Supabase jika bukan COD
   const { data, error } = await supabase
     .from("pembayaran")
     .select("*")
