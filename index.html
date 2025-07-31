@@ -153,7 +153,25 @@
   </style>
 </head>
 <body>
-<!-- Tambahkan ini di halaman index.html -->
+<div id="platformModal" class="modal" style="display: none; justify-content: center; align-items: center;">
+  <div class="modal-content" style="max-width: 400px;">
+    <h2>Pilih Platform Pemesanan</h2>
+    <p>Silakan pilih platform untuk melanjutkan:</p>
+
+    <!-- Tombol Telegram -->
+    <a href="menu.html?via=telegram" style="padding: 12px 24px; background:#004d4d; color:white; text-decoration:none; border:none; border-radius:8px; display:block; margin: 10px 0;">🔗 Telegram</a>
+
+    <!-- Tombol WhatsApp memicu form -->
+    <button onclick="tampilkanFormWA()" style="padding: 12px 24px; background:#25D366; color:white; border:none; border-radius:8px; display:block; margin: 10px 0;">💬 WhatsApp</button>
+
+    <!-- Form WhatsApp -->
+    <div id="formWA" style="display:none; margin-top:16px;">
+      <input type="text" id="wa_nama" placeholder="Nama lengkap" style="width:100%;padding:8px;margin-bottom:8px;" />
+      <input type="tel" id="wa_no" placeholder="08xxxxxxxxxx" style="width:100%;padding:8px;margin-bottom:8px;" />
+      <button onclick="lanjutkanWA()" style="width:100%;padding:10px;background:#004d4d;color:white;border:none;border-radius:8px;">Lanjutkan</button>
+    </div>
+    </div>
+    </div>
 <!-- Sidebar -->
 <div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
     <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
@@ -208,25 +226,19 @@
   );
   // 🔽 Masukkan fungsi initUser di sini
   function initUser() {
+    
     const urlParams = new URLSearchParams(window.location.search);
     const uidFromUrl = urlParams.get('uid');
     const via = urlParams.get('via');
-
+    
     if (uidFromUrl) {
-      localStorage.setItem('user_id', uidFromUrl);
-      localStorage.setItem('akses_via', 'telegram');
-    }
+  localStorage.setItem('user_id', uidFromUrl);
+  localStorage.setItem('akses_via', 'telegram');
+} else if (!localStorage.getItem('user_id')) {
+  document.getElementById("platformModal").style.display = "flex";
+}
 
     let user_id = localStorage.getItem('user_id');
-    if (!user_id) {
-      if (via === 'telegram') {
-        window.location.href = "https://t.me/DapurKanabot?start=go";
-      } else {
-        user_id = crypto.randomUUID();
-        localStorage.setItem('user_id', user_id);
-        localStorage.setItem('akses_via', via || 'web');
-      }
-    }
     return user_id;
   }
 
@@ -261,6 +273,51 @@
       container.appendChild(div);
     });
   }
+  window.tampilkanFormWA = () => {
+  document.getElementById("formWA").style.display = "block";
+};
+  window.lanjutkanWA = async function () {
+  const nama = document.getElementById("wa_nama").value.trim();
+  const no = document.getElementById("wa_no").value.trim();
+
+  if (!nama || !no) {
+    alert("Harap isi nama dan nomor WhatsApp.");
+    return;
+  }
+
+  const nomorBersih = no.replace(/\D/g, '');
+  const user_id = nomorBersih;
+
+  localStorage.setItem("user_id", user_id);
+  localStorage.setItem("akses_via", "whatsapp");
+  localStorage.setItem("nama_user", nama);
+
+  // ✅ Simpan ke tabel user_whatsapp jika belum ada
+  const { data: existing, error: fetchError } = await supabase
+    .from("user_whatsapp")
+    .select("id")
+    .eq("user_id", user_id)
+    .maybeSingle();
+
+  if (!existing) {
+    const { error: insertError } = await supabase
+      .from("user_whatsapp")
+      .insert({
+        user_id,
+        no_wa: nomorBersih,
+        nama,
+        waktu: new Date().toISOString(),
+      });
+
+    if (insertError) {
+      console.error("Gagal simpan user WA:", insertError);
+      alert("Terjadi kesalahan saat menyimpan data.");
+      return;
+    }
+  }
+
+  window.location.href = "menu.html";
+};
 
   window.showBannerModal = (url, judul, subjudul) => {
     document.getElementById("modalImg").src = url;
