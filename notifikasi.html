@@ -118,19 +118,37 @@
     "https://qcevidnjbsyjfdwfduiz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI" // ganti dengan anon key asli kamu
   );
-  const urlParams = new URLSearchParams(window.location.search);
-const uidFromUrl = urlParams.get('uid');
+  // 🔽 Masukkan fungsi initUser di sini
+  function initUser() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uidFromUrl = urlParams.get('uid');
+    const via = urlParams.get('via');
 
-if (uidFromUrl) {
-  localStorage.setItem('user_id', uidFromUrl);
-}
+    if (uidFromUrl) {
+      localStorage.setItem('user_id', uidFromUrl);
+      localStorage.setItem('akses_via', 'telegram');
+    }
 
-const user_id = localStorage.getItem("user_id");
+    let user_id = localStorage.getItem('user_id');
+    if (!user_id) {
+      if (via === 'telegram') {
+        window.location.href = "https://t.me/DapurKanabot?start=go";
+      } else {
+        user_id = crypto.randomUUID();
+        localStorage.setItem('user_id', user_id);
+        localStorage.setItem('akses_via', via || 'web');
+      }
+    }
+    return user_id;
+  }
 
-// Validasi
-if (!user_id) {
-  window.location.href = "https://t.me/DapurKanabot?start=go";
-}
+  // 🔽 Gunakan setelah dideklarasikan
+  const user_id = initUser();
+  const akses_via = localStorage.getItem('akses_via');
+
+  // Setelah ini baru kamu bisa lanjut pakai user_id
+  console.log("Akses via:", akses_via);
+  console.log("User ID:", user_id);
   
   async function loadNotifikasi() {
     const { data, error } = await supabase
@@ -158,7 +176,7 @@ console.log("Error:", error);
       const card = document.createElement("div");
       card.className = "notif-card";
       card.innerHTML = `
-  <h3>Pesanan #${pesanan.id.slice(0, 6)}</h3>
+<h3>Pesanan #${String(pesanan.id).slice(0, 6)}</h3>
   <p><strong>Waktu:</strong> ${new Date(pesanan.waktu).toLocaleString("id-ID")}</p>
   <p><strong>Nama:</strong> ${pesanan.nama}</p>
   <p><strong>Alamat:</strong> ${pesanan.alamat}</p>
