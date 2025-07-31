@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -9,103 +8,100 @@
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #00cfd3;
-    }
+    }header {
+  background: #004d4d;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+}
 
-    header {
-      background: #004d4d;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-    }
+.hamburger {
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
 
-    .hamburger {
-      font-size: 24px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
+.title {
+  font-size: 20px;
+  font-weight: bold;
+}
 
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-    }
+.icons {
+  display: flex;
+  gap: 16px;
+  font-size: 20px;
+}
 
-    .icons {
-      display: flex;
-      gap: 16px;
-      font-size: 20px;
-    }
+.sidebar {
+  height: 100%;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: -250px;
+  background-color: #003333;
+  padding-top: 60px;
+  transition: 0.3s;
+  z-index: 1000;
+}
 
-    /* Sidebar */
-    .sidebar {
-      height: 100%;
-      width: 250px;
-      position: fixed;
-      top: 0;
-      left: -250px;
-      background-color: #003333;
-      padding-top: 60px;
-      transition: 0.3s;
-      z-index: 1000;
-    }
+.sidebar a {
+  padding: 10px 20px;
+  text-decoration: none;
+  color: white;
+  display: block;
+}
 
-    .sidebar a {
-      padding: 10px 20px;
-      text-decoration: none;
-      color: white;
-      display: block;
-    }
+.sidebar a:hover {
+  background-color: #004d4d;
+}
 
-    .sidebar a:hover {
-      background-color: #004d4d;
-    }
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: none;
+  z-index: 999;
+}
 
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-      background-color: rgba(0, 0, 0, 0.4);
-      display: none;
-      z-index: 999;
-    }
+main {
+  padding: 16px;
+}
 
-    main {
-      padding: 16px;
-    }
+.main-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 16px;
+}
 
-    .main-title {
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 16px;
-    }
+.banner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
 
-    .banner-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
+.banner-grid img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}
 
-    .banner-grid img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
+@media (max-width: 600px) {
+  .banner-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
-    @media (max-width: 600px) {
-      .banner-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-        /* Modal */
-    .modal {
+.modal {
   position: fixed;
   z-index: 1000;
   top: 0;
@@ -113,12 +109,12 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0,0,0,0.8);
-  display: none; /* Tetap disembunyikan default */
+  display: none;
   justify-content: center;
   align-items: center;
   padding: 20px;
 }
-    .modal-content {
+.modal-content {
   background: white;
   border-radius: 16px;
   max-width: 90%;
@@ -135,41 +131,9 @@
   to { opacity: 1; transform: scale(1); }
 }
 
-    .modal-content img {
-      max-width: 100%;
-      border-radius: 12px;
-    }
-
-    .modal-content h2 {
-      margin-top: 20px;
-      font-size: 22px;
-    }
-
-    .modal-content p {
-      font-size: 16px;
-      color: #333;
-    }
-
   </style>
 </head>
 <body>
-<!-- Tambahkan ini di halaman index.html -->
-<div style="text-align:center; margin: 20px;">
-	<p style="color:white; margin-bottom: 10px;">Silakan pilih platform untuk melanjutkan:</p>
-  <h3>Akses Sebagai:</h3>
-  <a href="menu.html?via=telegram" style="padding: 12px 24px; background:#004d4d; color:white; text-decoration:none; border-radius:8px;">🔗 Telegram</a>
-  <a href="menu.html?via=whatsapp" style="padding: 12px 24px; background:#25D366; color:white; text-decoration:none; border-radius:8px;">💬 WhatsApp</a>
-  <a href="menu.html?via=web" style="padding: 12px 24px; background:#888; color:white; text-decoration:none; border-radius:8px;">🌐 Web Biasa</a>
-</div>
-<!-- Sidebar -->
-<div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
-    <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
-    <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
-    <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
-    <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
-  </div>
-  <div class="overlay" id="overlay"></div>
-<!-- Header -->
 <header>
   <button id="menuToggle" class="hamburger">☰</button>
   <div class="title">Dapur Kana</div>
@@ -177,115 +141,89 @@
     <a href="checkout.html" style="color: white; text-decoration: none;">🛒</a>
     <a href="notifikasi.html" style="color: white; text-decoration: none;">🔔</a>
   </div>
-</header>
-
-<main>
+</header><div id="sidebar" class="sidebar">
+  <a href="index.html">🏠 Beranda</a>
+  <a href="menu.html">🍽️ Menu</a>
+  <a href="checkout.html">🛒 Keranjang</a>
+  <a href="notifikasi.html">🔔 Notifikasi</a>
+</div>
+<div id="overlay" class="overlay"></div><main>
   <section class="welcome" style="padding: 20px; text-align: center; background-color: #00cfd3;">
-  <h2 style="color: #004d4d; font-size: 1.4em;">🍽️ Selamat Datang di Dapur Kana!</h2>
-  <p style="font-size: 1em; line-height: 1.4em; color: #004d4d; max-width: 90%; margin: auto;">
-    Halo, Sobat Lapar! 👋 Kami siap memanjakan lidahmu dengan <strong>menu rumahan lezat</strong>, higienis, dan ramah kantong.
-    <br><br>
-    🌟 Dimasak dengan cinta, cocok untuk makan siang, bekal, atau santai sore.
-    <br><br>
-    🔍 Jelajahi menu favoritmu & nikmati layanan cepat kami.
-    <br><br>
-    Karena di <strong>Dapur Kana</strong>, <em>rasa adalah cerita</em>.
-  </p>
-</section>
-  <div class="banner-grid" id="bannerContainer">
-    <!-- Banner akan diisi dari Supabase -->
-  </div>
-  <div id="bannerContainer"></div>
-</main>
-<!-- Modal Banner -->
-<div id="bannerModal" class="modal" onclick="closeModal()">
+    <h2 style="color: #004d4d; font-size: 1.4em;">🍽️ Selamat Datang di Dapur Kana!</h2>
+    <p style="font-size: 1em; line-height: 1.4em; color: #004d4d; max-width: 90%; margin: auto;">
+      Halo, Sobat Lapar! 👋 Kami siap memanjakan lidahmu dengan <strong>menu rumahan lezat</strong>, higienis, dan ramah kantong.
+      <br><br>
+      🌟 Dimasak dengan cinta, cocok untuk makan siang, bekal, atau santai sore.
+      <br><br>
+      🔍 Jelajahi menu favoritmu & nikmati layanan cepat kami.
+      <br><br>
+      Karena di <strong>Dapur Kana</strong>, <em>rasa adalah cerita</em>.
+    </p>
+  </section>
+  <div class="banner-grid" id="bannerContainer"></div>
+</main><div id="bannerModal" class="modal" onclick="closeModal()">
   <div class="modal-content" onclick="event.stopPropagation()">
     <img id="modalImg" src="" alt="Banner Besar" />
     <h2 id="modalJudul"></h2>
     <p id="modalSubjudul"></p>
     <button onclick="closeModal()">Tutup</button>
   </div>
-</div>
-<script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+</div><script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const supabase = createClient(
+  "https://qcevidnjbsyjfdwfduiz.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
+);
 
-  const supabase = createClient(
-    "https://qcevidnjbsyjfdwfduiz.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
-  );
-  // 🔽 Masukkan fungsi initUser di sini
-  function initUser() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const uidFromUrl = urlParams.get('uid');
-    const via = urlParams.get('via');
+function initUser() {
+  const user_id = localStorage.getItem("user_id");
+  const akses_via = localStorage.getItem("akses_via");
+  if (user_id && akses_via) return;
 
-    if (uidFromUrl) {
-      localStorage.setItem('user_id', uidFromUrl);
-      localStorage.setItem('akses_via', 'telegram');
-    }
-
-    let user_id = localStorage.getItem('user_id');
-    if (!user_id) {
-      if (via === 'telegram') {
-        window.location.href = "https://t.me/DapurKanabot?start=go";
-      } else {
-        user_id = crypto.randomUUID();
-        localStorage.setItem('user_id', user_id);
-        localStorage.setItem('akses_via', via || 'web');
-      }
-    }
-    return user_id;
+  const pilih = confirm("Silakan pilih OK untuk WhatsApp atau Cancel untuk Telegram");
+  if (pilih) {
+    const no_wa = prompt("Masukkan nomor WhatsApp (format 628xxx):");
+    if (!no_wa || !no_wa.startsWith("62")) return alert("Nomor tidak valid!");
+    const new_id = crypto.randomUUID();
+    supabase.from("user_whatsapp").insert([{ id: new_id, no_wa, nama: "" }]);
+    localStorage.setItem("user_id", new_id);
+    localStorage.setItem("akses_via", "whatsapp");
+  } else {
+    window.location.href = "https://t.me/DapurKanabot?start=go";
   }
+}
 
-  // 🔽 Gunakan setelah dideklarasikan
-  const user_id = initUser();
-  const akses_via = localStorage.getItem('akses_via');
+initUser();
 
-  // Setelah ini baru kamu bisa lanjut pakai user_id
-  console.log("Akses via:", akses_via);
-  console.log("User ID:", user_id);
-
-  async function loadBannerToIndex() {
-    const container = document.getElementById("bannerContainer");
-    container.innerHTML = "Memuat banner...";
-
-    const { data, error } = await supabase
-      .from("banners")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error || !data.length) {
-      container.innerHTML = "Tidak ada banner.";
-      return;
-    }
-
-    container.innerHTML = "";
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <img src="${item.url}" alt="banner" onclick="showBannerModal('${item.url}', '${item.judul || ''}', '${item.subjudul || ''}')" />
-      `;
-      container.appendChild(div);
-    });
+async function loadBannerToIndex() {
+  const container = document.getElementById("bannerContainer");
+  container.innerHTML = "Memuat banner...";
+  const { data, error } = await supabase.from("banners").select("*").order("created_at", { ascending: false });
+  if (error || !data.length) {
+    container.innerHTML = "Tidak ada banner.";
+    return;
   }
+  container.innerHTML = "";
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.innerHTML = `<img src="${item.url}" alt="banner" onclick="showBannerModal('${item.url}', '${item.judul || ''}', '${item.subjudul || ''}')" />`;
+    container.appendChild(div);
+  });
+}
 
-  window.showBannerModal = (url, judul, subjudul) => {
-    document.getElementById("modalImg").src = url;
-    document.getElementById("modalJudul").textContent = judul;
-    document.getElementById("modalSubjudul").textContent = subjudul;
-    document.getElementById("bannerModal").style.display = "flex";
-  }
+window.showBannerModal = (url, judul, subjudul) => {
+  document.getElementById("modalImg").src = url;
+  document.getElementById("modalJudul").textContent = judul;
+  document.getElementById("modalSubjudul").textContent = subjudul;
+  document.getElementById("bannerModal").style.display = "flex";
+};
 
-  window.closeModal = () => {
-    document.getElementById("bannerModal").style.display = "none";
-  }
+window.closeModal = () => {
+  document.getElementById("bannerModal").style.display = "none";
+};
 
-  
-
-  loadBannerToIndex();
-</script>
-<!-- Sidebar Script -->
-<script>
+loadBannerToIndex();
+</script><script>
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
   const toggleBtn = document.getElementById("menuToggle");
@@ -299,6 +237,5 @@
     sidebar.style.left = "-250px";
     overlay.style.display = "none";
   });
-</script>
-</body>
+</script></body>
 </html>
