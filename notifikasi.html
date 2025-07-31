@@ -118,8 +118,7 @@
     "https://qcevidnjbsyjfdwfduiz.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI" // ganti dengan anon key asli kamu
   );
-  // 🔽 Masukkan fungsi initUser di sini
-  function initUser() {
+function initUser() {
     const urlParams = new URLSearchParams(window.location.search);
     const uidFromUrl = urlParams.get('uid');
     const via = urlParams.get('via');
@@ -142,23 +141,17 @@
     return user_id;
   }
 
-  // 🔽 Gunakan setelah dideklarasikan
   const user_id = initUser();
   const akses_via = localStorage.getItem('akses_via');
-
-  // Setelah ini baru kamu bisa lanjut pakai user_id
-  console.log("Akses via:", akses_via);
   console.log("User ID:", user_id);
-  
+
   async function loadNotifikasi() {
     const { data, error } = await supabase
-  .from("pesanan")
-  .select("*")
-  .eq("user_id", user_id)
-  .order("waktu", { ascending: false });
+      .from("pesanan")
+      .select("*")
+      .eq("user_id", user_id)
+      .order("waktu", { ascending: false });
 
-console.log("Data:", data);
-console.log("Error:", error);
     const container = document.getElementById("notifContainer");
 
     if (error || !data || data.length === 0) {
@@ -169,36 +162,49 @@ console.log("Error:", error);
     container.innerHTML = "";
     data.forEach(pesanan => {
       const total = pesanan.total_harga || 0;
-      const items = pesanan.items || [];
 
+      // 🔧 Diperbaiki: validasi jika items bukan array
+      const items = Array.isArray(pesanan.items) ? pesanan.items : [];
       const itemList = items.map(item => `${item.nama} x ${item.qty}`).join(", ");
+
+      const waktu = new Date(pesanan.waktu || Date.now()).toLocaleString("id-ID"); // 🔧 fallback waktu
 
       const card = document.createElement("div");
       card.className = "notif-card";
       card.innerHTML = `
-<h3>Pesanan #${String(pesanan.id).slice(0, 6)}</h3>
-  <p><strong>Waktu:</strong> ${new Date(pesanan.waktu).toLocaleString("id-ID")}</p>
-  <p><strong>Nama:</strong> ${pesanan.nama}</p>
-  <p><strong>Alamat:</strong> ${pesanan.alamat}</p>
-  <p><strong>Metode:</strong> ${pesanan.metode}</p>
-  <p><strong>Items:</strong> ${itemList}</p>
-  <p><strong>Total:</strong> Rp ${total.toLocaleString()}</p>
-  ${pesanan.bukti_url ? `<p><strong>Bukti:</strong> <a href="${pesanan.bukti_url}" target="_blank">Lihat Bukti</a></p>` : ""}
-  <p class="status ${pesanan.status}">${pesanan.status}</p>
-`;
+        <h3>Pesanan #${String(pesanan.id).slice(0, 6)}</h3>
+        <p><strong>Waktu:</strong> ${waktu}</p>
+        <p><strong>Nama:</strong> ${pesanan.nama}</p>
+        <p><strong>Alamat:</strong> ${pesanan.alamat}</p>
+        <p><strong>Metode:</strong> ${pesanan.metode}</p>
+        <p><strong>Items:</strong> ${itemList}</p>
+        <p><strong>Total:</strong> Rp ${total.toLocaleString()}</p>
+        ${pesanan.bukti_url ? `<p><strong>Bukti:</strong> <a href="${pesanan.bukti_url}" target="_blank">Lihat Bukti</a></p>` : ""}
+        <p class="status ${pesanan.status}">${statusEmoji(pesanan.status)} ${pesanan.status}</p>
+      `;
       container.appendChild(card);
     });
   }
 
-  // Sidebar
+  // 🔧 Tambahkan emoji status
+  function statusEmoji(status) {
+    switch (status) {
+      case "Menunggu": return "⏳";
+      case "Diterima": return "✅";
+      case "Dikirim": return "🚚";
+      case "Selesai": return "✔️";
+      default: return "";
+    }
+  }
+
   window.openSidebar = () => {
     document.getElementById("sidebar").style.left = "0";
     document.getElementById("overlay").style.display = "block";
-  }
+  };
   window.closeSidebar = () => {
     document.getElementById("sidebar").style.left = "-250px";
     document.getElementById("overlay").style.display = "none";
-  }
+  };
 
   loadNotifikasi();
 </script>
