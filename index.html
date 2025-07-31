@@ -8,129 +8,105 @@
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #00cfd3;
-    }header {
-  background: #004d4d;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-}
-
-.hamburger {
-  font-size: 24px;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
-.title {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.icons {
-  display: flex;
-  gap: 16px;
-  font-size: 20px;
-}
-
-.sidebar {
-  height: 100%;
-  width: 250px;
-  position: fixed;
-  top: 0;
-  left: -250px;
-  background-color: #003333;
-  padding-top: 60px;
-  transition: 0.3s;
-  z-index: 1000;
-}
-
-.sidebar a {
-  padding: 10px 20px;
-  text-decoration: none;
-  color: white;
-  display: block;
-}
-
-.sidebar a:hover {
-  background-color: #004d4d;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: none;
-  z-index: 999;
-}
-
-main {
-  padding: 16px;
-}
-
-.main-title {
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 16px;
-}
-
-.banner-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.banner-grid img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-@media (max-width: 600px) {
-  .banner-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.modal {
-  position: fixed;
-  z-index: 1000;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.8);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-.modal-content {
-  background: white;
-  border-radius: 16px;
-  max-width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 20px;
-  text-align: center;
-  animation: fadeIn 0.3s ease;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
+    }
+    header {
+      background: #004d4d;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+    }
+    .hamburger {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .icons {
+      display: flex;
+      gap: 16px;
+      font-size: 20px;
+    }
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      background-color: #003333;
+      padding-top: 60px;
+      transition: 0.3s;
+      z-index: 1000;
+    }
+    .sidebar a {
+      padding: 10px 20px;
+      text-decoration: none;
+      color: white;
+      display: block;
+    }
+    .sidebar a:hover {
+      background-color: #004d4d;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 999;
+    }
+    main {
+      padding: 16px;
+    }
+    .main-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 16px;
+    }
+    .banner-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .banner-grid img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    @media (max-width: 600px) {
+      .banner-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .modal {
+      position: fixed;
+      z-index: 9999;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
@@ -141,13 +117,15 @@ main {
     <a href="checkout.html" style="color: white; text-decoration: none;">🛒</a>
     <a href="notifikasi.html" style="color: white; text-decoration: none;">🔔</a>
   </div>
-</header><div id="sidebar" class="sidebar">
+</header>
+<div id="sidebar" class="sidebar">
   <a href="index.html">🏠 Beranda</a>
   <a href="menu.html">🍽️ Menu</a>
   <a href="checkout.html">🛒 Keranjang</a>
   <a href="notifikasi.html">🔔 Notifikasi</a>
 </div>
-<div id="overlay" class="overlay"></div><main>
+<div id="overlay" class="overlay"></div>
+<main>
   <section class="welcome" style="padding: 20px; text-align: center; background-color: #00cfd3;">
     <h2 style="color: #004d4d; font-size: 1.4em;">🍽️ Selamat Datang di Dapur Kana!</h2>
     <p style="font-size: 1em; line-height: 1.4em; color: #004d4d; max-width: 90%; margin: auto;">
@@ -161,37 +139,55 @@ main {
     </p>
   </section>
   <div class="banner-grid" id="bannerContainer"></div>
-</main><div id="bannerModal" class="modal" onclick="closeModal()">
+</main>
+<div id="bannerModal" class="modal" onclick="closeModal()">
   <div class="modal-content" onclick="event.stopPropagation()">
     <img id="modalImg" src="" alt="Banner Besar" />
     <h2 id="modalJudul"></h2>
     <p id="modalSubjudul"></p>
     <button onclick="closeModal()">Tutup</button>
   </div>
+</div><!-- Modal Pilihan Platform --><div id="platformModal" class="modal">
+  <div class="modal-content">
+    <h2>Pilih Platform Akses</h2>
+    <p>Silakan pilih bagaimana kamu ingin mengakses Dapur Kana:</p>
+    <button onclick="pilihWhatsapp()" style="margin: 8px; background: #25D366; color: white; padding: 12px 20px; border: none; border-radius: 8px;">💬 WhatsApp</button>
+    <button onclick="pilihTelegram()" style="margin: 8px; background: #0088cc; color: white; padding: 12px 20px; border: none; border-radius: 8px;">📲 Telegram</button>
+  </div>
 </div><script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 const supabase = createClient(
   "https://qcevidnjbsyjfdwfduiz.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 );
+
+function showPlatformModal() {
+  document.getElementById("platformModal").style.display = "flex";
+}
+function hidePlatformModal() {
+  document.getElementById("platformModal").style.display = "none";
+}
 
 function initUser() {
   const user_id = localStorage.getItem("user_id");
   const akses_via = localStorage.getItem("akses_via");
   if (user_id && akses_via) return;
-
-  const pilih = confirm("Silakan pilih OK untuk WhatsApp atau Cancel untuk Telegram");
-  if (pilih) {
-    const no_wa = prompt("Masukkan nomor WhatsApp (format 628xxx):");
-    if (!no_wa || !no_wa.startsWith("62")) return alert("Nomor tidak valid!");
-    const new_id = crypto.randomUUID();
-    supabase.from("user_whatsapp").insert([{ id: new_id, no_wa, nama: "" }]);
-    localStorage.setItem("user_id", new_id);
-    localStorage.setItem("akses_via", "whatsapp");
-  } else {
-    window.location.href = "https://t.me/DapurKanabot?start=go";
-  }
+  showPlatformModal();
 }
+
+window.pilihWhatsapp = async function() {
+  const no_wa = prompt("Masukkan nomor WhatsApp (format 628xx):");
+  if (!no_wa || !no_wa.startsWith("62")) return alert("Nomor tidak valid!");
+  const id = crypto.randomUUID();
+  await supabase.from("user_whatsapp").insert([{ id, no_wa, nama: "" }]);
+  localStorage.setItem("user_id", id);
+  localStorage.setItem("akses_via", "whatsapp");
+  hidePlatformModal();
+};
+
+window.pilihTelegram = function() {
+  window.location.href = "https://t.me/DapurKanabot?start=go";
+};
 
 initUser();
 
@@ -237,5 +233,4 @@ loadBannerToIndex();
     sidebar.style.left = "-250px";
     overlay.style.display = "none";
   });
-</script></body>
-</html>
+</script
