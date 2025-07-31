@@ -153,24 +153,37 @@ const supabase = createClient(
   'https://qcevidnjbsyjfdwfduiz.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'
 );
-  const urlParams = new URLSearchParams(window.location.search);
-  const uidFromUrl = urlParams.get('uid');
+  // 🔽 Masukkan fungsi initUser di sini
+  function initUser() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uidFromUrl = urlParams.get('uid');
+    const via = urlParams.get('via');
 
-  if (uidFromUrl) {
-    localStorage.setItem('user_id', uidFromUrl);
+    if (uidFromUrl) {
+      localStorage.setItem('user_id', uidFromUrl);
+      localStorage.setItem('akses_via', 'telegram');
+    }
+
+    let user_id = localStorage.getItem('user_id');
+    if (!user_id) {
+      if (via === 'telegram') {
+        window.location.href = "https://t.me/DapurKanabot?start=go";
+      } else {
+        user_id = crypto.randomUUID();
+        localStorage.setItem('user_id', user_id);
+        localStorage.setItem('akses_via', via || 'web');
+      }
+    }
+    return user_id;
   }
 
-  let uid = localStorage.getItem('user_id');
+  // 🔽 Gunakan setelah dideklarasikan
+  const user_id = initUser();
+  const akses_via = localStorage.getItem('akses_via');
 
-  // Jika tidak ada atau bukan angka (Telegram ID selalu angka), redirect
-  if (!uid || isNaN(uid)) {
-    window.location.href = "https://t.me/DapurKanabot?start=go";
-  }
-// === USER ID ===
-let user_id = localStorage.getItem('user_id');
-if (!user_id || isNaN(user_id)) {
-  window.location.href = "https://t.me/DapurKanabot?start=go";
-}
+  // Setelah ini baru kamu bisa lanjut pakai user_id
+  console.log("Akses via:", akses_via);
+  console.log("User ID:", user_id);
 
 let checkoutData;
 
@@ -279,7 +292,13 @@ if (metode !== "COD" && buktiFile) {
   await supabase.from('checkout').delete().eq('id', checkoutData.id);
 
   alert('Pesanan berhasil dikirim!');
-window.location.href = "notifikasi.html?uid=" + user_id;
+
+if (akses_via === "whatsapp") {
+  const pesan = encodeURIComponent(`Halo, saya sudah pesan di Dapur Kana. Nama: ${nama}, Total: Rp ${checkoutData.total_harga.toLocaleString()}`);
+  window.location.href = `https://wa.me/6282334935818?text=${pesan}`; // Ganti dengan nomor admin kamu
+} else {
+  window.location.href = "notifikasi.html?uid=" + user_id;
+}
 };
 
 window.openSidebar = () => {
