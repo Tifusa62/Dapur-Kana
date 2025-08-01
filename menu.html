@@ -595,7 +595,7 @@ function cekJamOperasional() {
   const now = new Date();
   const jam = now.getHours();
   const menit = now.getMinutes();
-  if (jam >= 20 || jam < 13 || (jam === 13 && menit === 0)) {
+  if (jam >= 23 || jam < 13 || (jam === 13 && menit === 0)) {
     return;
   }
 
