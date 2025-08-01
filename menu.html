@@ -1,641 +1,1294 @@
 <!DOCTYPE html><html lang="id">
 
+
+
 <head>
+
+
 
   <meta charset="UTF-8" />
 
+
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+
 
   <title>Menu - Dapur Kana</title>
 
+
+
   <style>
+
+
 
     body {
 
+
+
       margin: 0;
+
+
 
       font-family: 'Segoe UI', sans-serif;
 
+
+
       background: #00cfd3;
+
+
 
     }header {
 
+
+
   background: #004d4d;
+
+
 
   color: white;
 
+
+
   padding: 10px 16px;
+
+
 
   display: flex;
 
+
+
   justify-content: space-between;
+
+
 
   align-items: center;
 
+
+
 }
+
+
+
+
 
 
 
 .hamburger {
 
+
+
   font-size: 24px;
+
+
 
   background: none;
 
+
+
   border: none;
+
+
 
   color: white;
 
+
+
   cursor: pointer;
 
+
+
 }
+
+
+
+
 
 
 
 .title {
 
+
+
   font-size: 20px;
+
+
 
   font-weight: bold;
 
+
+
 }
+
+
+
+
 
 
 
 .icons a {
 
+
+
   color: white;
+
+
 
   text-decoration: none;
 
+
+
   margin-left: 12px;
 
+
+
 }
+
+
+
+
 
 
 
 main {
 
+
+
   padding: 16px;
 
+
+
 }
+
+
+
+
 
 
 
 h2 {
 
+
+
   color: white;
+
+
 
   text-align: center;
 
+
+
 }
+
+
+
+
 
 
 
 .filter-container {
 
+
+
   text-align: center;
+
+
 
   margin-bottom: 16px;
 
+
+
 }
+
+
+
+
 
 
 
 select {
 
+
+
   padding: 10px;
+
+
 
   border-radius: 8px;
 
+
+
   border: none;
+
+
 
   font-size: 16px;
 
+
+
 }
+
+
+
+
 
 
 
 .menu-grid {
 
+
+
   display: grid;
+
+
 
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 
+
+
   gap: 12px;
 
+
+
 }
+
+
+
+
 
 
 
 .menu-card {
 
+
+
   background: white;
+
+
 
   border-radius: 16px;
 
+
+
   padding: 10px;
+
+
 
   text-align: center;
 
+
+
   cursor: pointer;
+
+
 
   position: relative;
 
+
+
 }
+
+
+
+
 
 
 
 .menu-card img {
 
+
+
   width: 100%;
+
+
 
   height: 120px;
 
+
+
   object-fit: cover;
+
+
 
   border-radius: 12px;
 
+
+
 }
+
+
+
+
 
 
 
 .menu-card h3 {
 
+
+
   margin: 10px 0 4px;
+
+
 
   font-size: 16px;
 
+
+
 }
+
+
+
+
 
 
 
 .menu-card p {
 
+
+
   font-size: 14px;
+
+
 
   color: #555;
 
+
+
 }
+
+
+
+
 
 
 
 .actions {
 
+
+
   display: flex;
+
+
 
   justify-content: center;
 
+
+
   align-items: center;
+
+
 
   margin-top: 8px;
 
+
+
   gap: 10px;
 
+
+
 }
+
+
+
+
 
 
 
 .actions button {
 
+
+
   background: #004d4d;
+
+
 
   color: white;
 
+
+
   border: none;
+
+
 
   padding: 5px 10px;
 
+
+
   border-radius: 8px;
+
+
 
   font-size: 18px;
 
+
+
   cursor: pointer;
 
+
+
 }
+
+
+
+
 
 
 
 .modal {
 
+
+
   display: none;
+
+
 
   position: fixed;
 
+
+
   z-index: 999;
+
+
 
   top: 0; left: 0;
 
+
+
   width: 100%;
+
+
 
   height: 100%;
 
+
+
   background: rgba(0,0,0,0.7);
+
+
 
   justify-content: center;
 
+
+
   align-items: center;
 
+
+
 }
+
+
+
+
 
 
 
 .modal-content {
 
+
+
   background: white;
+
+
 
   color: black;
 
+
+
   padding: 20px;
+
+
 
   border-radius: 16px;
 
+
+
   max-width: 90%;
+
+
 
   max-height: 90%;
 
+
+
   overflow: auto;
+
+
 
   text-align: center;
 
+
+
 }
+
+
+
+
 
 
 
 .modal-content img {
 
+
+
   max-width: 100%;
+
+
 
   border-radius: 12px;
 
+
+
 }
+
+
+
+
 
 
 
 .modal-content h3 {
 
+
+
   margin-top: 12px;
 
+
+
 }
+
+
+
+
 
 
 
 .modal-content p {
 
+
+
   color: #333;
 
+
+
 }
+
+
+
+
 
 
 
 .close-btn {
 
+
+
   margin-top: 12px;
+
+
 
   padding: 10px 20px;
 
+
+
   background: #004d4d;
+
+
 
   color: white;
 
+
+
   border: none;
+
+
 
   border-radius: 8px;
 
+
+
   cursor: pointer;
 
+
+
 }
+
+
+
+
 
 
 
   </style>
 
+
+
 </head>
+
+
 
 <body><header>
 
+
+
   <button class="hamburger" onclick="openSidebar()">☰</button>
+
+
 
   <div class="title">Menu</div>
 
+
+
   <div class="icons">
+
+
 
     <a href="checkout.html">🛒</a>
 
+
+
     <a href="notifikasi.html">🔔</a>
 
+
+
   </div>
+
+
 
 </header><div id="sidebar" style="position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #003333; z-index: 1000; padding-top: 60px; transition: 0.3s;">
 
+
+
   <a href="index.html" style="color:white; display:block; padding:10px 20px;">🏠 Beranda</a>
+
+
 
   <a href="menu.html" style="color:white; display:block; padding:10px 20px;">🍽️ Menu</a>
 
+
+
   <a href="checkout.html" style="color:white; display:block; padding:10px 20px;">🛒 Keranjang</a>
+
+
 
   <a href="notifikasi.html" style="color:white; display:block; padding:10px 20px;">🔔 Notifikasi</a>
 
+
+
 </div><div id="overlay" onclick="closeSidebar()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index:999;"></div><main>
+
+
 
   <h2>Daftar Menu</h2>
 
+
+
   <div class="filter-container">
+
+
 
     <select id="filterKategori">
 
+
+
       <option value="">Semua Kategori</option>
+
+
 
     </select>
 
+
+
   </div>
+
+
 
   <div class="menu-grid" id="menuContainer">Memuat menu...</div>
 
+
+
 </main><div id="menuModal" class="modal" onclick="closeModal()">
+
+
 
   <div class="modal-content" onclick="event.stopPropagation()">
 
+
+
     <img id="modalImg" src="" />
+
+
 
     <h3 id="modalNama"></h3>
 
+
+
     <p id="modalDeskripsi"></p>
+
+
 
     <p id="modalHarga"></p>
 
+
+
     <button class="close-btn" onclick="closeModal()">Tutup</button>
+
+
 
   </div>
 
+
+
 </div><script type="module">
+
+
 
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 
 
+
+
+
+
   const supabase = createClient(
+
+
 
     "https://qcevidnjbsyjfdwfduiz.supabase.co",
 
+
+
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI"
 
+
+
   );
+
   // 🔽 Masukkan fungsi initUser di sini
+
   function initUser() {
+
     const urlParams = new URLSearchParams(window.location.search);
+
     const uidFromUrl = urlParams.get('uid');
+
     const via = urlParams.get('via');
 
+
+
     if (uidFromUrl) {
+
       localStorage.setItem('user_id', uidFromUrl);
+
       localStorage.setItem('akses_via', 'telegram');
+
     }
+
+
 
     let user_id = localStorage.getItem('user_id');
+
     if (!user_id) {
+
       if (via === 'telegram') {
+
         window.location.href = "https://t.me/DapurKanabot?start=go";
+
       } else {
+
         user_id = crypto.randomUUID();
+
         localStorage.setItem('user_id', user_id);
+
         localStorage.setItem('akses_via', via || 'web');
+
       }
+
     }
+
     return user_id;
+
   }
 
+
+
   // 🔽 Gunakan setelah dideklarasikan
+
   const user_id = initUser();
+
   const akses_via = localStorage.getItem('akses_via');
 
+
+
   // Setelah ini baru kamu bisa lanjut pakai user_id
+
   console.log("Akses via:", akses_via);
+
   console.log("User ID:", user_id);
+
+
+
+
 
 
 
   const menuContainer = document.getElementById("menuContainer");
 
+
+
   const filterSelect = document.getElementById("filterKategori");
 
+
+
 function cekJamOperasional() {
+
   const now = new Date();
+
   const jam = now.getHours();
+
   const menit = now.getMinutes();
 
+
+
   // Toko tutup dari jam 21:00 sampai jam 12:59
-  const sedangTutup = false;
+
+  const sedangTutup = (jam >= 20 || jam < 13 || (jam === 13 && menit === 0));
+
+
 
   if (sedangTutup) {
+
     // Nonaktifkan tombol terkait pesanan
+
     document.querySelectorAll(".btn-plus, .btn-minus, .pesan-btn").forEach(btn => {
+
       btn.disabled = true;
+
       btn.style.opacity = 0.5;
+
       btn.style.cursor = "not-allowed";
+
     });
 
+
+
     // Tampilkan banner notifikasi
+
     const notif = document.createElement("div");
+
     notif.style.background = "#ff4d4d";
+
     notif.style.color = "white";
+
     notif.style.padding = "12px";
+
     notif.style.borderRadius = "12px";
+
     notif.style.textAlign = "center";
+
     notif.style.margin = "12px";
+
     notif.innerHTML = "⚠️ Toko tutup dari jam 20:00 sampai 13:00. Silakan kembali setelah jam 13:01.";
+
     document.body.prepend(notif);
+
   }
+
 }
 
+
+
   async function loadMenu() {
+
+
 
     const { data, error } = await supabase.from("menu").select("*").order("nama");
 
 
 
+
+
+
+
     if (error) {
+
+
 
       menuContainer.innerHTML = "Gagal memuat menu.";
 
+
+
       return;
 
+
+
     }
+
+
+
+
 
 
 
     const kategoriSet = new Set();
 
+
+
     menuContainer.innerHTML = "";
+
+
+
+
 
 
 
     data.forEach(item => {
 
+
+
       kategoriSet.add(item.kategori);
+
+
 
       const div = document.createElement("div");
 
+
+
       div.className = "menu-card";
+
+
 
       div.setAttribute("data-kategori", item.kategori);
 
 
 
+
+
+
+
       div.innerHTML = `
+
+
 
         <img src="${item.gambar_url}" alt="${item.nama}" />
 
+
+
         <h3>${item.nama}</h3>
+
+
 
         <p>Rp ${item.harga.toLocaleString()}</p>
 
+
+
         <div class="actions">
+
         <button class="btn-minus" onclick="kurangItem('${item.id}')">-</button>
+
         <span id="qty-${item.id}">0</span>
+
         <button class="btn-plus" onclick="tambahItem('${item.id}', ${item.harga}, '${item.nama}')">+</button>
+
         </div>
+
+
 
       `;
 
+
+
       div.addEventListener("click", (e) => {
+
+
 
         if (!e.target.closest(".actions")) {
 
+
+
           showModal(item);
+
+
 
         }
 
+
+
       });
+
+
 
       menuContainer.appendChild(div);
 
+
+
     });
+
+
+
+
 
 
 
     kategoriSet.forEach(kat => {
 
+
+
       const option = document.createElement("option");
+
+
 
       option.value = kat;
 
+
+
       option.textContent = kat;
+
+
 
       filterSelect.appendChild(option);
 
+
+
     });
+
     cekJamOperasional()
 
+
+
   }
+
+
+
+
 
 
 
   filterSelect.addEventListener("change", () => {
 
+
+
     const selected = filterSelect.value;
+
+
 
     const cards = document.querySelectorAll(".menu-card");
 
+
+
     cards.forEach(card => {
+
+
 
       card.style.display = (selected === "" || card.dataset.kategori === selected) ? "block" : "none";
 
+
+
     });
+
+
 
   });
 
 
 
+
+
+
+
   function showModal(item) {
+
+
 
     document.getElementById("modalImg").src = item.gambar_url;
 
+
+
     document.getElementById("modalNama").textContent = item.nama;
+
+
 
     document.getElementById("modalDeskripsi").textContent = item.deskripsi || "-";
 
+
+
     document.getElementById("modalHarga").textContent = `Harga: Rp ${item.harga.toLocaleString()}`;
+
+
 
     document.getElementById("menuModal").style.display = "flex";
 
+
+
   }
+
+
+
+
 
 
 
   window.closeModal = () => {
 
+
+
     document.getElementById("menuModal").style.display = "none";
 
+
+
   }
+
+
+
+
 
 
 
   window.openSidebar = () => {
 
+
+
     document.getElementById("sidebar").style.left = "0";
+
+
 
     document.getElementById("overlay").style.display = "block";
 
+
+
   }
+
+
+
+
 
 
 
   window.closeSidebar = () => {
 
+
+
     document.getElementById("sidebar").style.left = "-250px";
 
+
+
     document.getElementById("overlay").style.display = "none";
+
+
 
   }
 
 
 
+
+
+
+
   async function tambahItem(id, harga, nama) {
-  
+
+  const now = new Date();
+
+  const jam = now.getHours();
+
+  const menit = now.getMinutes();
+
+  if (jam >= 20 || jam < 13 || (jam === 13 && menit === 0)) {
+
+    return;
+
+  }
+
+
+
   // ...lanjutkan isi fungsi tambahItem seperti biasa
+
+
 
     const qtySpan = document.getElementById("qty-" + id);
 
+
+
     const qty = parseInt(qtySpan.innerText) + 1;
+
+
 
     qtySpan.innerText = qty;
 
 
 
+
+
+
+
     const { data: existing, error } = await supabase
+
+
 
       .from("checkout")
 
+
+
       .select("id, item")
 
+
+
       .eq("user_id", user_id)
+
+
 
       .maybeSingle();
 
 
 
+
+
+
+
     let items = [];
+
+
 
     if (existing) {
 
+
+
       items = existing.item || [];
 
+
+
     }
+
+
+
+
 
 
 
     const index = items.findIndex(i => i.id === id);
 
+
+
     if (index >= 0) {
+
+
 
       items[index].qty += 1;
 
+
+
     } else {
+
+
 
       items.push({ id, nama, harga, qty: 1 });
 
+
+
     }
+
+
+
+
 
 
 
@@ -643,43 +1296,87 @@ function cekJamOperasional() {
 
 
 
+
+
+
+
     if (existing) {
+
+
 
       await supabase.from("checkout").update({ item: items, total_harga: total }).eq("id", existing.id);
 
+
+
     } else {
+
+
 
       await supabase.from("checkout").insert([{ user_id: user_id, item: items, total_harga: total }]);
 
+
+
     }
+
+
 
   }
 
 
 
+
+
+
+
   async function kurangItem(id) {
+
+
 
     const qtySpan = document.getElementById("qty-" + id);
 
+
+
     let qty = parseInt(qtySpan.innerText);
+
+
 
     if (qty <= 0) return;
 
+
+
     qty--;
+
+
 
     qtySpan.innerText = qty;
 
 
 
+
+
+
+
     const { data: existing } = await supabase
+
+
 
       .from("checkout")
 
+
+
       .select("id, item")
+
+
 
       .eq("user_id", user_id)
 
+
+
       .maybeSingle();
+
+
+
+
 
 
 
@@ -687,36 +1384,73 @@ function cekJamOperasional() {
 
 
 
+
+
+
+
     let items = existing.item || [];
+
+
 
     const index = items.findIndex(i => i.id === id);
 
+
+
     if (index >= 0) {
+
+
 
       items[index].qty--;
 
+
+
       if (items[index].qty <= 0) items.splice(index, 1);
+
+
 
     }
 
 
 
+
+
+
+
     const total = items.reduce((a, b) => a + b.qty * b.harga, 0);
 
+
+
     await supabase.from("checkout").update({ item: items, total_harga: total }).eq("id", existing.id);
+
+
 
   }
 
 
 
+
+
+
+
   window.tambahItem = tambahItem;
+
+
 
   window.kurangItem = kurangItem;
 
 
 
+
+
+
+
   loadMenu();
+
+
 
 </script></body>
 
+
+
 </html>
+
