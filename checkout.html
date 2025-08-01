@@ -426,14 +426,15 @@ if (!statusError && statusData?.nilai === "tutup") {
     alert("Maaf, toko sedang tutup dan tidak menerima pesanan saat ini.");
   };
 }
-async function updateCheckout(items) {
+window.updateCheckout = async function(items) {
   const total = items.reduce((sum, i) => sum + i.qty * i.harga, 0);
   await supabase.from('checkout').update({ item: items, total_harga: total }).eq('id', checkoutData.id);
   checkoutData.item = items;
   checkoutData.total_harga = total;
   loadKeranjang();
-}
-async function kirimNotifikasiTelegram(pesanan) {
+};
+
+window.kirimNotifikasiTelegram = async function(pesanan) {
   const { user_id, nama, platform, items, catatan } = pesanan;
   const message = `
 📥 Pesanan Baru Masuk!
