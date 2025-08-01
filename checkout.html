@@ -234,86 +234,134 @@ window.kurangItem = async function (id) {
 };
 
 window.submitPesanan = async function () {
-  const nama = document.getElementById('nama').value;
-  const no_hp = document.getElementById('no_hp').value;
-  const alamat = document.getElementById('alamat').value;
-  const metode = document.getElementById('metode').value;
-  const buktiFile = document.getElementById('bukti').files[0];
-  const waktu_kirim = document.getElementById('waktu_kirim').value;
+  console.log("🚀 Mulai submit...");
 
-  if (!nama || !no_hp || !alamat || !waktu_kirim || !metode) return alert('Lengkapi semua field!');
-  if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) return alert('Keranjang kosong!');
+  // Ambil data form
+  const nama = document.getElementById('nama').value.trim();
+  const no_hp = document.getElementById('no_hp').value.trim();
+  const alamat = document.getElementById('alamat').value.trim();
+  const metode = document.getElementById('metode').value;
+  const waktu_kirim = document.getElementById('waktu_kirim').value;
+  const buktiFile = document.getElementById('bukti')?.files[0];
+
+  if (!nama || !no_hp || !alamat || !waktu_kirim || !metode) {
+    alert("⚠️ Lengkapi semua field terlebih dahulu!");
+    return;
+  }
+
+  if (!checkoutData || !checkoutData.item || checkoutData.item.length === 0) {
+    alert("🛒 Keranjang kosong!");
+    return;
+  }
 
   let buktiUrl = null;
+
   if (metode !== "COD" && buktiFile) {
-    const fileExt = buktiFile.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `bukti/${user_id}/${fileName}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-  .from('bukti-pembayaran')
-  .upload(filePath, buktiFile);
+    try {
+      const timestamp = Date.now();
+      const fileExt = buktiFile.name.split('.').pop();
+      const fileName = `bukti-${timestamp}.${fileExt}`;
+      const filePath = `${user_id}/${fileName}`;
 
-if (uploadError || !uploadData) {
-  console.error("Gagal upload bukti:", uploadError);
-  return alert('Gagal upload bukti pembayaran');
-}
-    const { data: publicUrlData } = supabase.storage.from('bukti-pembayaran').getPublicUrl(filePath);
-    buktiUrl = publicUrlData.publicUrl;
+      console.log("📤 Upload bukti ke:", filePath);
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('bukti-pembayaran')
+        .upload(filePath, buktiFile, {
+          contentType: buktiFile.type,
+          upsert: true,
+        });
+
+      if (uploadError || !uploadData) {
+        console.error("❌ Upload gagal:", uploadError);
+        alert("❌ Gagal upload bukti pembayaran. Coba file lain.");
+        return;
+      }
+
+      const { data: publicData, error: publicError } = supabase
+        .storage
+        .from('bukti-pembayaran')
+        .getPublicUrl(filePath);
+
+      if (publicError || !publicData) {
+        console.error("❌ Gagal ambil public URL:", publicError);
+        alert("❌ Bukti terupload, tapi gagal mengambil URL.");
+        return;
+      }
+
+      buktiUrl = publicData.publicUrl;
+      console.log("🌐 Bukti URL:", buktiUrl);
+    } catch (err) {
+      console.error("❌ Upload error:", err);
+      alert("❌ Terjadi kesalahan saat upload bukti.");
+      return;
+    }
   }
 
-  const { error: insertError } = await supabase.from('pesanan').insert({
-    nama,
-    no_hp,
-    alamat,
-    waktu_kirim,
-    metode,
-    items: checkoutData.item,
-    total_harga: checkoutData.total_harga,
-    status: 'Menunggu',
-    user_id,
-    bukti_url: buktiUrl
-  });
-
-  if (insertError) {
-    console.error("Insert error:", insertError.message, insertError.details);
-    return alert('Gagal kirim pesanan: ' + insertError.message);
-  }
-
-  // ✅ Notifikasi ke Telegram user
-  if (akses_via === "telegram") {
-    await fetch(GAS_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        type: "user",
-        user_id,
-        message: "✅ Pesanan kamu sudah kami terima!\n🍽️ Silakan tunggu konfirmasi dari admin ya. Terima kasih 🙏",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+  // Simpan ke Supabase
+  try {
+    const { error: insertError } = await supabase.from('pesanan').insert({
+      nama,
+      no_hp,
+      alamat,
+      waktu_kirim,
+      metode,
+      items: checkoutData.item,
+      total_harga: checkoutData.total_harga,
+      status: 'Menunggu',
+      user_id,
+      akses_via,
+      bukti_url: buktiUrl,
     });
-  }
 
-  // ✅ Hapus checkout dan notifikasi owner
-  await supabase.from('checkout').delete().eq('id', checkoutData.id);
-  await kirimNotifikasiTelegram({
-    user_id,
-    nama,
-    platform: akses_via,
-    items: checkoutData.item.map(i => `${i.nama} x${i.qty}`),
-    catatan: "-"
-  });
+    if (insertError) {
+      console.error("❌ Gagal simpan pesanan:", insertError);
+      alert("❌ Gagal menyimpan pesanan.");
+      return;
+    }
 
-  
-  if (akses_via === "whatsapp") {
-    const pesan = `Halo, saya sudah pesan di Dapur Kana. Nama: ${nama}, Total: Rp ${checkoutData.total_harga.toLocaleString()}`;
-    const urlShare = `https://wa.me/6282334935818?text=${encodeURIComponent(pesan)}`;
-    document.getElementById("btnShareWA").href = urlShare;
-    document.getElementById("btnShareWA").style.display = "block";
-    return;
-  } else {
-  	alert('Pesanan berhasil dikirim!');
-    window.location.href = "notifikasi.html?uid=" + user_id;
+    // Hapus keranjang
+    await supabase.from('checkout').delete().eq('id', checkoutData.id);
+
+    // Kirim notifikasi ke Telegram user
+    if (akses_via === "telegram") {
+      await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          type: "user",
+          user_id,
+          message: "✅ Pesanan kamu sudah kami terima!\n🍽️ Silakan tunggu konfirmasi dari admin ya. Terima kasih 🙏",
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Kirim notifikasi ke Telegram owner
+    await kirimNotifikasiTelegram({
+      user_id,
+      nama,
+      platform: akses_via,
+      items: checkoutData.item.map(i => `${i.nama} x${i.qty}`),
+      catatan: "-"
+    });
+
+    // Alert sukses
+    alert("✅ Pesanan berhasil dikirim!");
+
+    // Arahkan
+    setTimeout(() => {
+      if (akses_via === "whatsapp") {
+        const pesan = `Halo, saya sudah pesan di Dapur Kana.\nNama: ${nama}\nTotal: Rp ${checkoutData.total_harga.toLocaleString("id-ID")}`;
+        const url = `https://wa.me/6282334935818?text=${encodeURIComponent(pesan)}`;
+        window.location.href = url;
+      } else {
+        window.location.href = "notifikasi.html?uid=" + user_id;
+      }
+    }, 1000);
+
+  } catch (err) {
+    console.error("❌ Error submit:", err);
+    alert("❌ Terjadi kesalahan saat submit pesanan.");
   }
 };
 window.openSidebar = () => {
