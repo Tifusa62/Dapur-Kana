@@ -245,7 +245,7 @@ window.submitPesanan = async function () {
 
   // Ambil data form
   const nama = document.getElementById('nama').value;
-  const hp = document.getElementById('hp').value;
+  const no_hp = document.getElementById('no_hp').value;
   const alamat = document.getElementById('alamat').value;
   const metode = document.getElementById('metode').value;
   const waktuAntar = document.getElementById('waktuAntar').value;
@@ -267,15 +267,17 @@ window.submitPesanan = async function () {
 
   // Simpan ke Supabase
   const { data: insertData, error: insertError } = await supabase.from("pesanan").insert([{
-    nama,
-    hp,
-    alamat,
-    metode,
-    waktu_antar: waktuAntar,
-    akses_via,
-    total_harga: checkoutData.total,
-    items: checkoutData.item,
-    bukti_url: urlBukti,
+  nama,
+  no_hp, // ⬅️ bukan "hp"
+  alamat,
+  metode,
+  items: JSON.stringify(items),
+  total_harga: totalHarga,
+  status: "Menunggu",
+  user_id: uid || null,
+  bukti_url: urlBukti || null,
+  waktu_kirim: waktuAntar,
+  akses_via,
   }]);
 
   if (insertError) {
