@@ -321,15 +321,15 @@ window.submitPesanan = async function () {
     alert('Pesanan berhasil dikirim!');
 
     setTimeout(() => {
-      if (akses_via === "whatsapp") {
-        const pesan = `Halo, saya sudah pesan di Dapur Kana. Nama: ${nama}, Total: Rp ${checkoutData.total_harga.toLocaleString()}`;
-        const urlShare = `https://wa.me/6282334935818?text=${encodeURIComponent(pesan)}`;
-        document.getElementById("btnShareWA").href = urlShare;
-        document.getElementById("btnShareWA").style.display = "block";
-      } else {
-        window.location.href = "notifikasi.html?uid=" + user_id;
-      }
-    }, 1000);
+  if (akses_via === "whatsapp") {
+    const pesan = `Halo, saya sudah pesan di Dapur Kana.\nNama: ${nama}\nTotal: Rp ${checkoutData.total_harga.toLocaleString("id-ID")}`;
+    const urlShare = `https://wa.me/6282334935818?text=${encodeURIComponent(pesan)}`;
+    console.log("🔁 Redirect ke WhatsApp:", urlShare);
+    window.location.href = urlShare; // langsung redirect
+  } else {
+    window.location.href = "notifikasi.html?uid=" + user_id;
+  }
+}, 1000);
 
   } catch (err) {
     console.error("❌ Error submit:", err);
