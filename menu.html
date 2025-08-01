@@ -425,7 +425,7 @@ function cekJamOperasional() {
   const menit = now.getMinutes();
 
   // Toko tutup dari jam 21:00 sampai jam 12:59
-  const sedangTutup = (jam >= 20 || jam < 13 || (jam === 13 && menit === 0));
+  const sedangTutup = (jam >= 23 || jam < 13 || (jam === 13 && menit === 0));
 
   if (sedangTutup) {
     // Nonaktifkan tombol terkait pesanan
