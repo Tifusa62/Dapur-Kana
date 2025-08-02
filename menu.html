@@ -852,7 +852,7 @@ function cekJamOperasional() {
 
   // Toko tutup dari jam 21:00 sampai jam 12:59
 
-  const sedangTutup = (jam >= 20 || jam < 13 || (jam === 13 && menit === 0));
+  const sedangTutup = (jam >= 20 || jam < 10 || (jam === 10 && menit === 0));
 
 
 
@@ -1192,7 +1192,7 @@ function cekJamOperasional() {
 
   const menit = now.getMinutes();
 
-  if (jam >= 20 || jam < 13 || (jam === 13 && menit === 0)) {
+  if (jam >= 20 || jam < 10 || (jam === 10 && menit === 0)) {
 
     return;
 
