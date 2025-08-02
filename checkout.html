@@ -158,7 +158,51 @@
     const TELEGRAM_BOT_TOKEN = '7981245691:AAHUZvl-qlWjyCpTAOOR0h3K1_pflUHNhO8';
     const OWNER_WA_NUMBER = '6282334935818'; // Ganti dengan nomor WA owner tanpa tanda +
 
-    window.submitPesanan = async function () {
+   async function loadKeranjang() {
+  const { data } = await supabase.from('checkout').select('*').eq('user_id', user_id).maybeSingle();
+  console.log("User ID:", user_id);
+  console.log("Data checkout:", data);
+  checkoutData = data;
+  const container = document.getElementById('keranjangList');
+  if (!data || !data.item || data.item.length === 0) {
+    container.innerHTML = 'Keranjang kosong.';
+    return;
+  }
+
+  let total = 0;
+  container.innerHTML = data.item.map(item => {
+    total += item.qty * item.harga;
+    return `
+      <div class="keranjang-item">
+        <div>${item.nama}</div>
+        <div class="qty-control">
+          <button onclick="kurangItem('${item.id}')">-</button>
+          <span id="qty-${item.id}">${item.qty}</span>
+          <button onclick="tambahItem('${item.id}')">+</button>
+        </div>
+        <div>Rp ${(item.qty * item.harga).toLocaleString()}</div>
+      </div>`;
+  }).join('') + `<div class="total">Total: Rp ${total.toLocaleString()}</div>`;
+}
+
+window.tambahItem = async function (id) {
+  const items = checkoutData.item;
+  const index = items.findIndex(i => i.id === id);
+  if (index >= 0) items[index].qty++;
+  updateCheckout(items);
+};
+
+window.kurangItem = async function (id) {
+  let items = checkoutData.item;
+  const index = items.findIndex(i => i.id === id);
+  if (index >= 0) {
+    items[index].qty--;
+    if (items[index].qty <= 0) items.splice(index, 1);
+  }
+  updateCheckout(items);
+};
+
+  window.submitPesanan = async function () {
       const nama = document.getElementById('nama').value;
       const no_hp = document.getElementById('no_hp').value;
       const alamat = document.getElementById('alamat').value;
