@@ -146,19 +146,41 @@
 </main>
 
 <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    const supabaseUrl = 'https://qcevdinbsyifdwfuiz.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  'https://qcevidnjbsyjfdwfduiz.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZXZpZG5qYnN5amZkd2ZkdWl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwMzcwODksImV4cCI6MjA2ODYxMzA4OX0.bR-FZBvVbY7njHKvI_lA0GPs4TaHQKq8YzX2a-dJ3JI'
+);
+  const urlParams = new URLSearchParams(window.location.search);
+  const uidFromUrl = urlParams.get('uid');
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
     const user_id = localStorage.getItem('user_id');
     const platform = localStorage.getItem('platform') || 'whatsapp';
     const checkoutData = JSON.parse(localStorage.getItem('checkoutData'));
     const TELEGRAM_BOT_TOKEN = '7981245691:AAHUZvl-qlWjyCpTAOOR0h3K1_pflUHNhO8';
-    const OWNER_WA_NUMBER = '6282334935818'; // Ganti dengan nomor WA owner tanpa tanda +
+    const OWNER_WA_NUMBER = '6282334935818';
 
-   async function loadKeranjang() {
+  if (uidFromUrl) {
+    localStorage.setItem('user_id', uidFromUrl);
+  }
+
+  let uid = localStorage.getItem('user_id');
+
+  // Jika tidak ada atau bukan angka (Telegram ID selalu angka), redirect
+  if (!uid || isNaN(uid)) {
+    window.location.href = "https://t.me/DapurKanabot?start=go";
+  }
+// === USER ID ===
+let user_id = localStorage.getItem('user_id');
+if (!user_id || isNaN(user_id)) {
+  window.location.href = "https://t.me/DapurKanabot?start=go";
+}
+
+let checkoutData;
+
+async function loadKeranjang() {
   const { data } = await supabase.from('checkout').select('*').eq('user_id', user_id).maybeSingle();
   console.log("User ID:", user_id);
   console.log("Data checkout:", data);
@@ -202,7 +224,15 @@ window.kurangItem = async function (id) {
   updateCheckout(items);
 };
 
-  window.submitPesanan = async function () {
+async function updateCheckout(items) {
+  const total = items.reduce((sum, i) => sum + i.qty * i.harga, 0);
+  await supabase.from('checkout').update({ item: items, total_harga: total }).eq('id', checkoutData.id);
+  checkoutData.item = items;
+  checkoutData.total_harga = total;
+  loadKeranjang();
+}
+
+window.submitPesanan = async function () {
       const nama = document.getElementById('nama').value;
       const no_hp = document.getElementById('no_hp').value;
       const alamat = document.getElementById('alamat').value;
