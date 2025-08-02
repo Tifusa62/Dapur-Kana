@@ -154,13 +154,19 @@ const supabase = createClient(
 );
   const urlParams = new URLSearchParams(window.location.search);
   const uidFromUrl = urlParams.get('uid');
-  const aksesVia = localStorage.getItem('akses_via') || 'telegram';
 
   if (uidFromUrl) {
     localStorage.setItem('user_id', uidFromUrl);
   }
 
-  const user_id = localStorage.getItem('user_id');
+  let uid = localStorage.getItem('user_id');
+
+  // Jika tidak ada atau bukan angka (Telegram ID selalu angka), redirect
+  if (!uid || isNaN(uid)) {
+    window.location.href = "https://t.me/DapurKanabot?start=go";
+  }
+// === USER ID ===
+let user_id = localStorage.getItem('user_id');
 if (!user_id || isNaN(user_id)) {
   window.location.href = "https://t.me/DapurKanabot?start=go";
 }
@@ -259,7 +265,6 @@ if (metode !== "COD" && buktiFile) {
     total_harga: checkoutData.total_harga,
     status: 'Menunggu',
     user_id,
-    akses_via: aksesVia,
     bukti_url: buktiUrl
   });
 
@@ -273,32 +278,7 @@ if (metode !== "COD" && buktiFile) {
   await supabase.from('checkout').delete().eq('id', checkoutData.id);
 
   alert('Pesanan berhasil dikirim!');
-
-if (aksesVia === 'telegram') {
-  
-  try {
-    await fetch(`https://api.telegram.org/bot7981245691:AAHUZvl-qlWjyCpTAOOR0h3K1_pflUHNhO8/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: user_id,
-        text: `Terima kasih, ${nama}! Pesanan kamu telah kami terima dan sedang diproses 🍽️`
-      })
-    });
-    window.location.href = "notifikasi.html?uid=" + user_id;
-  } catch (err) {
-    console.error("Gagal kirim pesan ke user telegram:", err);
-  }
-
-} else if (aksesVia === 'whatsapp') {
-  // Redirect ke WhatsApp Owner
-  const ownerWa = '6282334935818'; // GANTI DENGAN NOMOR ADMIN
-  const text = `Pesanan baru dari *${nama}* via WhatsApp:\n\nTotal: Rp ${checkoutData.total_harga.toLocaleString()}\n\nNo HP: ${no_hp}\nAlamat: ${alamat}\n\nCek dashboard segera!`;
-  const waUrl = `https://wa.me/${ownerWa}?text=${encodeURIComponent(text)}`;
-  window.location.href = waUrl;
-  return;
-}
-
+window.location.href = "notifikasi.html?uid=" + user_id;
 };
 
 window.openSidebar = () => {
