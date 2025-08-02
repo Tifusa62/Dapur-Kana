@@ -314,9 +314,104 @@ window.submitPesanan = async function () {
         return;
       }
 
-      alert('Pesanan berhasil dikirim!');
-      window.location.href = "notifikasi.html?uid=" + user_id;
-    }
+ // Hapus keranjang
+  await supabase.from('checkout').delete().eq('id', checkoutData.id);
+
+  alert('Pesanan berhasil dikirim!');
+window.location.href = "notifikasi.html?uid=" + user_id;
+};
+
+window.openSidebar = () => {
+  document.getElementById("sidebar").style.left = "0";
+  document.getElementById("overlay").style.display = "block";
+};
+
+window.closeSidebar = () => {
+  document.getElementById("sidebar").style.left = "-250px";
+  document.getElementById("overlay").style.display = "none";
+};
+
+const infoPembayaranDiv = document.getElementById("infoPembayaran");
+
+// Preview bukti pembayaran
+document.getElementById("bukti").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const preview = document.getElementById("previewBukti");
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  }
+});
+
+// Tampilkan info pembayaran dari tabel
+document.getElementById("metode").addEventListener("change", async (e) => {
+  const metode = e.target.value;
+
+  const buktiSection = document.getElementById("buktiSection");
+  const infoPembayaranDiv = document.getElementById("infoPembayaran");
+
+  // Jika COD, sembunyikan upload bukti dan info pembayaran
+  if (metode === "COD") {
+    buktiSection.style.display = "none";
+    infoPembayaranDiv.innerHTML = `<p><strong>Pembayaran akan dilakukan langsung saat pengantaran.</strong></p>`;
+    return;
+  } else {
+    buktiSection.style.display = "block";
+  }
+
+  // Ambil info pembayaran dari Supabase jika bukan COD
+  const { data, error } = await supabase
+    .from("pembayaran")
+    .select("*")
+    .eq("metode", metode)
+    .maybeSingle();
+
+  if (error || !data) {
+    infoPembayaranDiv.innerHTML = "";
+    return;
+  }
+
+  if (metode.toLowerCase() === "qris") {
+    infoPembayaranDiv.innerHTML = `
+      <p>Silakan scan QRIS berikut:</p>
+      <img src="${data.qris_url}" style="max-width: 100%; border-radius: 12px;" />
+    `;
+  } else {
+    infoPembayaranDiv.innerHTML = `
+      <p><strong>Bank:</strong> ${data.nama_bank}</p>
+      <p><strong>Nomor Rekening:</strong> ${data.rekening}</p>
+      <p><strong>Atas Nama:</strong> ${data.atas_nama}</p>
+    `;
+  }
+});
+loadKeranjang();
+
+// CEK STATUS TOKO
+const { data: statusData, error: statusError } = await supabase
+  .from("pengaturan")
+  .select("nilai")
+  .eq("nama", "status_toko")
+  .single();
+
+if (!statusError && statusData?.nilai === "tutup") {
+  const tombol = document.querySelector("button.submit");
+  tombol.disabled = true;
+  tombol.style.opacity = "0.5";
+  tombol.style.cursor = "not-allowed";
+
+  const infoTutup = document.createElement("div");
+  infoTutup.innerHTML = `
+    <div style="background:#ffeaea;padding:12px;border-left:5px solid red;margin-top:20px;border-radius:8px">
+      ❌ <b>Toko sedang tutup.</b><br>Saat ini kami tidak menerima pesanan. Anda tetap dapat melihat menu.
+    </div>`;
+  document.querySelector(".form-container").prepend(infoTutup);
+
+  // Cegah submit
+  window.submitPesanan = function () {
+    alert("Maaf, toko sedang tutup dan tidak menerima pesanan saat ini.");
+  };
+}
+
   </script>
 </body>
 </html>
